@@ -90,7 +90,7 @@
         <gwt.i18n.version>1.0.2</gwt.i18n.version>
 
         <domino.history.version>1.0.3</domino.history.version>
-        <domino.ui.version>2.0.0</domino.ui.version>
+        <domino.ui.version>2.0.1</domino.ui.version>
         <domino.auto.version>1.0.2</domino.auto.version>
     </properties>
 
@@ -99,7 +99,7 @@
             <dependency>
                 <groupId>org.gwtproject</groupId>
                 <artifactId>gwt</artifactId>
-                <version>2.10.0</version>
+                <version>2.11.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -363,7 +363,7 @@
                     <configuration>
                         <!--Only required due to a GWT DateTimeFormat issue see https://github.com/gwtproject/gwt/issues/8259-->
                         <argLine>-Duser.timezone=UTC</argLine>
-                        <sourceLevel>1.8</sourceLevel>
+                        <sourceLevel>${maven.compiler.source}</sourceLevel>
                         <failOnError>true</failOnError>
                         <useCompilerArgsForTests>true</useCompilerArgsForTests>
                         <codeserverArgs>

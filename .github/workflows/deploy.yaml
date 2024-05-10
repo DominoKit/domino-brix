@@ -18,14 +18,14 @@ name: Deploy
 
 on:
   push:
-    branches: [ master , development ]
+    branches: [ main , development ]
 
 jobs:
   verify:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        java-version: [ 11 ]
+        java-version: [ 11 , 17 , 21 ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3

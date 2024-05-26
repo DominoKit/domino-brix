@@ -22,6 +22,7 @@ import static java.util.Objects.nonNull;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.inject.Inject;
 import org.dominokit.brix.annotations.Global;
 import org.dominokit.brix.events.BrixEvent;
@@ -45,6 +46,8 @@ public abstract class Presenter<V extends Viewable>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Presenter.class);
 
+  private final String ID = UUID.randomUUID().toString();
+
   @Inject @Global protected AppHistory globalRouter;
 
   @Inject @Global protected BrixEvents events;
@@ -65,7 +68,7 @@ public abstract class Presenter<V extends Viewable>
   private Set<ChildListener> childListeners = new HashSet<>();
 
   public Presenter() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] have been created.");
+    LOGGER.info("Presenter [" + this + "] have been created.");
   }
 
   private V getView() {
@@ -102,11 +105,11 @@ public abstract class Presenter<V extends Viewable>
   }
 
   protected void postConstruct() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : PostConstruct.");
+    LOGGER.info("Presenter [" + this + "] : PostConstruct.");
   }
 
   private void onAttached() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Attached.");
+    LOGGER.info("Presenter [" + this + "] : Attached.");
     registerSlots();
     onRevealed();
     onReady();
@@ -115,7 +118,7 @@ public abstract class Presenter<V extends Viewable>
   protected void registerSlots() {}
 
   private void onReady() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Ready.");
+    LOGGER.info("Presenter [" + this + "] : Ready.");
     Set<ChildListener> temp = new HashSet<>(childListeners);
     temp.forEach(
         listener -> {
@@ -125,7 +128,7 @@ public abstract class Presenter<V extends Viewable>
   }
 
   private void onDetached() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Detached.");
+    LOGGER.info("Presenter [" + this + "] : Detached.");
     onRemoved();
     if (active) {
       deactivate();
@@ -139,17 +142,21 @@ public abstract class Presenter<V extends Viewable>
   @Override
   public void onEventReceived(BrixEvent event) {}
 
+  protected boolean isEnabled() {
+    return true;
+  }
+
   void doActivate() {
-    if (!active) {
+    if (!active && isEnabled()) {
       if (getAuthorizer().isAuthorized(securityContext, this)) {
-        LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Activating.");
+        LOGGER.info("Presenter [" + this + "] : Activating.");
         slotListenerRecord = slots.listen(this);
         setAttachHandlers();
         setNavigationInterceptor();
         eventsListenerRecord = events.register(this);
         this.active = true;
         onActivated();
-        LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Activated.");
+        LOGGER.info("Presenter [" + this + "] : Activated.");
         tryReveal();
       } else {
         securityContext.reportUnAuthorizedAccess();
@@ -329,5 +336,10 @@ public abstract class Presenter<V extends Viewable>
 
   interface ChildListener {
     void invoke();
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getCanonicalName() + "[" + ID + "]";
   }
 }

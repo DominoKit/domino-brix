@@ -18,6 +18,7 @@ package org.dominokit.brix.impl;
 import static java.util.Objects.nonNull;
 import static org.dominokit.domino.ui.utils.Domino.elementOf;
 
+import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import org.dominokit.brix.api.BrixSlots;
 import org.dominokit.brix.api.Slot;
@@ -50,6 +51,8 @@ public class BodyElementSlot implements Slot {
     if (nonNull(view)) {
       if (view instanceof IsElement<?>) {
         remove(currentView);
+        DomGlobal.console.info(
+            "Revealing view [" + view.getId() + "] into slot [" + getKey() + "]");
         body.appendChild((IsElement<? extends Element>) view);
         this.currentView = view;
       } else {

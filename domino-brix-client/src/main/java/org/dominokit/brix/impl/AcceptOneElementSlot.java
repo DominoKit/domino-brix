@@ -18,6 +18,7 @@ package org.dominokit.brix.impl;
 import static java.util.Objects.nonNull;
 import static org.dominokit.domino.ui.utils.Domino.elementOf;
 
+import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import org.dominokit.brix.api.Slot;
 import org.dominokit.brix.api.Viewable;
@@ -62,6 +63,7 @@ public class AcceptOneElementSlot implements Slot {
   public void reveal(Viewable view) {
     if (nonNull(view)) {
       if (view instanceof IsElement<?>) {
+        DomGlobal.console.info("Revealing view [" + view.getId() + "] into slot [" + key + "]");
         element.clearElement().appendChild((IsElement<? extends Element>) view);
       } else {
         throw new IllegalArgumentException(

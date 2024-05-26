@@ -17,4 +17,6 @@ package org.dominokit.brix.api;
 
 public interface Viewable {
   boolean isAttached();
+
+  String getId();
 }

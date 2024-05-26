@@ -92,6 +92,7 @@
         <domino.history.version>1.0.3</domino.history.version>
         <domino.ui.version>2.0.1</domino.ui.version>
         <domino.auto.version>1.0.2</domino.auto.version>
+        <dagger.version>2.51.1</dagger.version>
     </properties>
 
     <dependencyManagement>
@@ -113,21 +114,26 @@
                 <artifactId>guava</artifactId>
                 <version>32.0.1-jre</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>failureaccess</artifactId>
+                <version>1.0.2</version>
+            </dependency>
             <!-- https://mvnrepository.com/artifact/com.google.dagger/dagger -->
             <dependency>
                 <groupId>com.google.dagger</groupId>
                 <artifactId>dagger</artifactId>
-                <version>2.49</version>
+                <version>${dagger.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.dagger</groupId>
                 <artifactId>dagger-gwt</artifactId>
-                <version>2.49</version>
+                <version>${dagger.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.dagger</groupId>
                 <artifactId>dagger-compiler</artifactId>
-                <version>2.49</version>
+                <version>${dagger.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

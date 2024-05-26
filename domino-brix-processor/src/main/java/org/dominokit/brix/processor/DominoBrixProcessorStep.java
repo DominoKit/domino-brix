@@ -39,7 +39,6 @@ import com.squareup.javapoet.TypeSpec;
 import dagger.Binds;
 import dagger.Lazy;
 import dagger.Module;
-import dagger.Provides;
 import dagger.multibindings.IntoSet;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -187,7 +186,8 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
                           .addStatement("return this.coreComponent")
                           .build());
 
-              generateStartupTasks(elementsByAnnotation, superModule);
+              TypeSpec typeSpec = generateStartupTasks(moduleName, elementsByAnnotation);
+              writeFile(typeSpec, element);
 
               elementsByAnnotation
                   .get(BrixPresenter.class.getCanonicalName())
@@ -892,24 +892,31 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
     }
   }
 
-  private void generateStartupTasks(
-      ImmutableSetMultimap<String, Element> elementsByAnnotation, TypeSpec.Builder superModule) {
+  private TypeSpec generateStartupTasks(
+      String moduleName, ImmutableSetMultimap<String, Element> elementsByAnnotation) {
+
+    TypeSpec.Builder tasksModule =
+        TypeSpec.interfaceBuilder(
+                "Brix" + sourceUtil.capitalizeFirstLetter(moduleName) + "TasksModule_")
+            .addAnnotation(Module.class);
     elementsByAnnotation
         .get(Task.class.getCanonicalName())
         .forEach(
             taskElement -> {
-              superModule.addMethod(
+              tasksModule.addMethod(
                   MethodSpec.methodBuilder(
                           sourceUtil.smallFirstLetter(taskElement.getSimpleName().toString()))
                       .addAnnotation(Singleton.class)
                       .addAnnotation(IntoSet.class)
-                      .addAnnotation(Provides.class)
+                      .addAnnotation(Binds.class)
                       .addAnnotation(BrixTask.class)
-                      .addModifiers(Modifier.PUBLIC)
+                      .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                      .addParameter(
+                          ParameterSpec.builder(TypeName.get(taskElement.asType()), "task").build())
                       .returns(StartupTask.class)
-                      .addStatement("return new $T()", taskElement)
                       .build());
             });
+    return tasksModule.build();
   }
 
   private void writeFile(TypeSpec typeSpec, Element element) {

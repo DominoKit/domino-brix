@@ -30,15 +30,14 @@ public abstract class AbstractChildRoutingTask<
     bind(parent, presenter);
     this.listener =
         state -> {
-          if (parent.isActive()) {
-            presenter.setRoutingState(state);
-            presenter.activate();
-          }
+          presenter.setRoutingState(state);
+          presenter.activate();
         };
     this.history.listen(presenter.getTokenFilter(), listener);
   }
 
   protected void bind(P parent, C child) {
     child.setParent(parent);
+    child.onBindParent(parent);
   }
 }

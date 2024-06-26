@@ -91,12 +91,22 @@ public abstract class Presenter<V extends Viewable>
     return "";
   }
 
-  TokenFilter tokenFilter() {
+  protected boolean isHashBasedRouting() {
+    String path = getRoutingPath();
+    if (nonNull(path) && !path.isEmpty()) {
+      return path.contains("#");
+    }
+    return false;
+  }
+
+  protected TokenFilter tokenFilter() {
     String path = getRoutingPath();
     if (isNull(path) || path.trim().isEmpty()) {
       return TokenFilter.any();
     } else {
-      return TokenFilter.startsWithPathFilter(path);
+      return isHashBasedRouting()
+          ? TokenFilter.startsWithFragment(path)
+          : TokenFilter.startsWithPathFilter(path);
     }
   }
 

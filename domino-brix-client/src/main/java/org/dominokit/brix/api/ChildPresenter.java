@@ -28,16 +28,32 @@ public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V 
     return parent;
   }
 
-  TokenFilter tokenFilter() {
+  @Override
+  protected boolean isHashBasedRouting() {
+    return super.isHashBasedRouting() || getParent().isHashBasedRouting();
+  }
+
+  protected TokenFilter tokenFilter() {
     String path = getRoutingPath();
     if (isNull(path) || path.trim().isEmpty()) {
       return getParent().getTokenFilter();
     } else {
       String parentPath = getParent().getRoutingPath();
       if (isNull(parentPath) || parentPath.trim().isEmpty()) {
-        return TokenFilter.startsWithPathFilter(getRoutingPath());
+        return isHashBasedRouting()
+            ? TokenFilter.startsWithFragment(getRoutingPath())
+            : TokenFilter.startsWithPathFilter(getRoutingPath());
       } else {
-        return TokenFilter.startsWithPathFilter(parentPath + getRoutingPath());
+        if (getParent().isHashBasedRouting()) {
+          return TokenFilter.startsWithFragment(parentPath + getRoutingPath());
+        } else {
+          if (isHashBasedRouting()) {
+            return CompositeFilter.of(
+                getParent().getTokenFilter(), TokenFilter.startsWithFragment(getRoutingPath()));
+          } else {
+            return TokenFilter.startsWithPathFilter(parentPath + getRoutingPath());
+          }
+        }
       }
     }
   }
@@ -54,4 +70,6 @@ public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V 
   void setParent(P parent) {
     this.parent = parent;
   }
+
+  public void onBindParent(P parent) {}
 }

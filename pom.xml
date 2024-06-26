@@ -89,8 +89,8 @@
         <elemental2.version>1.2.1</elemental2.version>
         <gwt.i18n.version>1.0.2</gwt.i18n.version>
 
-        <domino.history.version>1.0.3</domino.history.version>
-        <domino.ui.version>2.0.1</domino.ui.version>
+        <domino.history.version>HEAD-SNAPSHOT</domino.history.version>
+        <domino.ui.version>HEAD-SNAPSHOT</domino.ui.version>
         <domino.auto.version>1.0.2</domino.auto.version>
         <dagger.version>2.51.1</dagger.version>
     </properties>

@@ -16,17 +16,18 @@
     <description>The annotation processor to generate domino-brix components</description>
     <url>https://github.com/DominoKit/domino-brix</url>
 
-
     <dependencies>
         <dependency>
             <groupId>org.dominokit</groupId>
             <artifactId>domino-brix-client</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.dominokit</groupId>
             <artifactId>domino-brix-shared</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.dominokit</groupId>

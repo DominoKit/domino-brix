@@ -20,10 +20,14 @@ import java.util.Set;
 public interface HasContext<T> {
 
   default void update(T context) {
+    update(context, Operation.UPDATED);
+  }
+
+  default void update(T context, Operation operation) {
     getContextListeners()
         .forEach(
             contextListener -> {
-              contextListener.onContextUpdated(context);
+              contextListener.onContextChange(context, operation);
             });
   }
 
@@ -40,6 +44,25 @@ public interface HasContext<T> {
   }
 
   interface ContextListener<T> {
-    void onContextUpdated(T context);
+    void onContextChange(T context, Operation operation);
+  }
+
+  interface Operation {
+    Operation CREATED = () -> "CREATED";
+    Operation UPDATED = () -> "UPDATED";
+    Operation DELETED = () -> "DELETED";
+
+    String getKey();
+
+    default boolean isEqualTo(Operation other) {
+      return getKey().equals(other.getKey());
+    }
+
+    default Operation when(Operation other, Runnable runnable) {
+      if (isEqualTo(other)) {
+        runnable.run();
+      }
+      return this;
+    }
   }
 }

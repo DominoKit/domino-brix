@@ -48,6 +48,7 @@
         <url>https://github.com/DominoKit/domino-brix</url>
     </scm>
 
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -406,4 +407,11 @@
             </build>
         </profile>
     </profiles>
+
+    <repositories>
+        <repository>
+            <id>SNAPSHOTS</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 </project>

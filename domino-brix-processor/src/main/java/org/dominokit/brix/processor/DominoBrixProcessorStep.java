@@ -75,7 +75,6 @@ import org.dominokit.brix.PresentationModule;
 import org.dominokit.brix.annotations.BrixModule;
 import org.dominokit.brix.annotations.BrixPresenter;
 import org.dominokit.brix.annotations.BrixRoute;
-import org.dominokit.brix.annotations.BrixRoutingTask;
 import org.dominokit.brix.annotations.BrixSlot;
 import org.dominokit.brix.annotations.BrixTask;
 import org.dominokit.brix.annotations.FragmentParameter;
@@ -478,33 +477,38 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
   private void generateUiHandlers(Element presenter, TypeSpec.Builder presenterBuilder) {
     List<Element> methods = sourceUtil.getAnnotatedMethods(presenter.asType(), UiHandler.class);
 
-    String name = presenter.getSimpleName().toString() + "UiHandlers";
-    TypeSpec.Builder builder = TypeSpec.interfaceBuilder(name).addModifiers(Modifier.PUBLIC);
-    methods.stream()
-        .map(element -> (ExecutableElement) element)
-        .forEach(
-            method -> {
-              MethodSpec.Builder interfaceMethod =
-                  MethodSpec.methodBuilder(method.getSimpleName().toString())
-                      .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                      .returns(TypeName.get(method.getReturnType()));
+    if (!methods.isEmpty()) {
+      String name = presenter.getSimpleName().toString() + "UiHandlers";
+      TypeSpec.Builder builder =
+          TypeSpec.interfaceBuilder(name)
+              .addModifiers(Modifier.PUBLIC)
+              .addSuperinterface(UiHandlers.class);
+      methods.stream()
+          .map(element -> (ExecutableElement) element)
+          .forEach(
+              method -> {
+                MethodSpec.Builder interfaceMethod =
+                    MethodSpec.methodBuilder(method.getSimpleName().toString())
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(TypeName.get(method.getReturnType()));
 
-              method
-                  .getParameters()
-                  .forEach(
-                      variableElement -> {
-                        interfaceMethod.addParameter(
-                            ParameterSpec.builder(
-                                    TypeName.get(variableElement.asType()),
-                                    variableElement.getSimpleName().toString())
-                                .build());
-                      });
-              builder.addMethod(interfaceMethod.build());
-            });
-    processingEnv
-        .getMessager()
-        .printMessage(Diagnostic.Kind.NOTE, "======= > Writing uiHandlers : " + name);
-    writeFile(builder.build(), presenter);
+                method
+                    .getParameters()
+                    .forEach(
+                        variableElement -> {
+                          interfaceMethod.addParameter(
+                              ParameterSpec.builder(
+                                      TypeName.get(variableElement.asType()),
+                                      variableElement.getSimpleName().toString())
+                                  .build());
+                        });
+                builder.addMethod(interfaceMethod.build());
+              });
+      processingEnv
+          .getMessager()
+          .printMessage(Diagnostic.Kind.NOTE, "======= > Writing uiHandlers : " + name);
+      writeFile(builder.build(), presenter);
+    }
   }
 
   private void collectAnnotatedMethods(
@@ -719,10 +723,20 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
   }
 
   private void generatePresenterBinding(Element presenter, TypeSpec.Builder bindingModule) {
+
+    Set<? extends AnnotationMirror> qualifiers = getQualifiers(presenter);
     sourceUtil
         .findImplementedInterface(presenter, UiHandlers.class)
         .ifPresent(
             typeMirror -> {
+              ParameterSpec.Builder presenterParam =
+                  ParameterSpec.builder(guessImpl(presenter, "Impl"), "impl");
+              qualifiers.forEach(
+                  annotationMirror ->
+                      presenterParam.addAnnotation(
+                          ClassName.get(
+                              (TypeElement) annotationMirror.getAnnotationType().asElement())));
+
               MethodSpec.Builder bindMethod =
                   MethodSpec.methodBuilder(
                           sourceUtil.smallFirstLetter(presenter.getSimpleName().toString()))
@@ -730,8 +744,7 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
                       .addAnnotation(Binds.class)
                       .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                       .returns(TypeName.get(typeMirror))
-                      .addParameter(
-                          ClassName.bestGuess(presenter.asType().toString() + "Impl"), "impl");
+                      .addParameter(presenterParam.build());
               getQualifiers(presenter)
                   .forEach(
                       annotationMirror ->
@@ -740,6 +753,14 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
                                   (TypeElement) annotationMirror.getAnnotationType().asElement())));
               bindingModule.addMethod(bindMethod.build());
             });
+  }
+
+  private ClassName guessImpl(Element element, String postfix) {
+    return ClassName.bestGuess(
+        elements().getPackageOf(element).getQualifiedName().toString()
+            + "."
+            + element.getSimpleName().toString()
+            + postfix);
   }
 
   private void generateViewBinding(Element uiView, TypeSpec.Builder bindingModule) {
@@ -754,8 +775,7 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
                       .addAnnotation(Binds.class)
                       .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                       .returns(TypeName.get(typeMirror))
-                      .addParameter(
-                          ClassName.bestGuess(uiView.asType().toString() + "_UiView"), "impl");
+                      .addParameter(guessImpl(uiView, "_UiView"), "impl");
 
               getQualifiers(uiView)
                   .forEach(
@@ -783,7 +803,7 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
                       TypeName.get(presenter.asType())));
 
       ParameterSpec.Builder parentParam =
-          ParameterSpec.builder(ClassName.bestGuess(parentPresenter + "Impl"), "parent");
+          ParameterSpec.builder(guessImpl(types().asElement(parentPresenter), "Impl"), "parent");
       Set<? extends AnnotationMirror> parentQualifiers =
           getQualifiers(types().asElement(parentPresenter));
       parentQualifiers.forEach(
@@ -795,11 +815,12 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
       Set<? extends AnnotationMirror> qualifiers = getQualifiers(presenter);
 
       ParameterSpec.Builder presenterParam =
-          ParameterSpec.builder(
-              ClassName.bestGuess(presenter.asType().toString() + "Impl"), "presenter");
+          ParameterSpec.builder(guessImpl(presenter, "Impl"), "presenter");
       qualifiers.forEach(
           annotationMirror -> {
             presenterParam.addAnnotation(
+                ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
+            routingTask.addAnnotation(
                 ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
           });
 
@@ -818,21 +839,29 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
       TypeSpec routingType = routingTask.build();
       writeFile(routingType, presenter);
 
-      bindingModule.addMethod(
+      ParameterSpec.Builder parameter =
+          ParameterSpec.builder(guessImpl(presenter, "Routing"), "routing");
+
+      MethodSpec.Builder routingMethod =
           MethodSpec.methodBuilder(
-                  sourceUtil.smallFirstLetter(presenter.getSimpleName().toString() + "Routing"))
+              sourceUtil.smallFirstLetter(presenter.getSimpleName().toString() + "Routing"));
+
+      getQualifiers(presenter)
+          .forEach(
+              annotationMirror -> {
+                parameter.addAnnotation(
+                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
+                routingMethod.addAnnotation(
+                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
+              });
+
+      bindingModule.addMethod(
+          routingMethod
               .addAnnotation(Singleton.class)
               .addAnnotation(Binds.class)
               .addAnnotation(IntoSet.class)
-              .addAnnotation(BrixRoutingTask.class)
               .returns(RoutingTask.class)
-              .addParameter(
-                  ClassName.bestGuess(
-                      elements().getPackageOf(presenter).getQualifiedName().toString()
-                          + "."
-                          + presenter.getSimpleName().toString()
-                          + "Routing"),
-                  "routing")
+              .addParameter(parameter.build())
               .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
               .build());
 
@@ -844,13 +873,14 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
                       ClassName.get(AbstractRoutingTask.class), TypeName.get(presenter.asType())));
 
       ParameterSpec.Builder presenterParam =
-          ParameterSpec.builder(
-              ClassName.bestGuess(presenter.asType().toString() + "Impl"), "presenter");
+          ParameterSpec.builder(guessImpl(presenter, "Impl"), "presenter");
 
       Set<? extends AnnotationMirror> qualifiers = getQualifiers(presenter);
       qualifiers.forEach(
           annotationMirror -> {
             presenterParam.addAnnotation(
+                ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
+            routingTask.addAnnotation(
                 ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
           });
 
@@ -872,21 +902,28 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
       TypeSpec routingType = routingTask.build();
       writeFile(routingType, presenter);
 
-      bindingModule.addMethod(
+      ParameterSpec.Builder parameter =
+          ParameterSpec.builder(guessImpl(presenter, "Routing"), "routing");
+
+      MethodSpec.Builder routingMethod =
           MethodSpec.methodBuilder(
-                  sourceUtil.smallFirstLetter(presenter.getSimpleName().toString() + "Routing"))
+              sourceUtil.smallFirstLetter(presenter.getSimpleName().toString() + "Routing"));
+      getQualifiers(presenter)
+          .forEach(
+              annotationMirror -> {
+                parameter.addAnnotation(
+                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
+                routingMethod.addAnnotation(
+                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
+              });
+
+      bindingModule.addMethod(
+          routingMethod
               .addAnnotation(Singleton.class)
               .addAnnotation(Binds.class)
               .addAnnotation(IntoSet.class)
-              .addAnnotation(BrixRoutingTask.class)
               .returns(RoutingTask.class)
-              .addParameter(
-                  ClassName.bestGuess(
-                      elements().getPackageOf(presenter).getQualifiedName().toString()
-                          + "."
-                          + presenter.getSimpleName().toString()
-                          + "Routing"),
-                  "routing")
+              .addParameter(parameter.build())
               .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
               .build());
     }

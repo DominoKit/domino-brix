@@ -19,7 +19,6 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
 import javax.inject.Singleton;
-import org.dominokit.brix.annotations.BrixRoutingTask;
 import org.dominokit.brix.api.RoutingTask;
 import org.dominokit.brix.presenters.ChildPresenterRouting;
 import org.dominokit.brix.presenters.ChildUiHandlers;
@@ -40,12 +39,10 @@ public interface MVPModule {
   @Singleton
   @Binds
   @IntoSet
-  @BrixRoutingTask
   RoutingTask testRoutingTask(TestPresenterRouting routing);
 
   @Singleton
   @Binds
   @IntoSet
-  @BrixRoutingTask
   RoutingTask childRoutingTask(ChildPresenterRouting routing);
 }

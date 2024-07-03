@@ -91,7 +91,7 @@ public class BrixCore {
   }
 
   public void register(RoutingTask task) {
-    LOGGER.info("Registering routing task");
+    LOGGER.info("Registering routing task : " + task.getClass().getCanonicalName());
   }
 
   public void init(Map<String, String> config) {

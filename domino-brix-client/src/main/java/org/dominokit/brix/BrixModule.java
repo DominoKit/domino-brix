@@ -18,7 +18,6 @@ package org.dominokit.brix;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.dominokit.brix.annotations.BrixRoutingTask;
 import org.dominokit.brix.annotations.BrixTask;
 import org.dominokit.brix.api.RoutingTask;
 import org.dominokit.brix.api.StartupTask;
@@ -30,8 +29,7 @@ public class BrixModule extends BrixModuleAdapter {
   private final Set<RoutingTask> routingTasks;
 
   @Inject
-  public BrixModule(
-      @BrixTask Set<StartupTask> startupTasks, @BrixRoutingTask Set<RoutingTask> routingTasks) {
+  public BrixModule(@BrixTask Set<StartupTask> startupTasks, Set<RoutingTask> routingTasks) {
     this.startupTasks = startupTasks;
     this.routingTasks = routingTasks;
   }

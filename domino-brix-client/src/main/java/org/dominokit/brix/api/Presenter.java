@@ -66,6 +66,7 @@ public abstract class Presenter<V extends Viewable>
   private final Set<RegistrationRecord> registeredSlots = new HashSet<>();
   protected V view;
   private Set<ChildListener> childListeners = new HashSet<>();
+  private boolean reveled;
 
   public Presenter() {
     LOGGER.info("Presenter [" + this + "] have been created.");
@@ -120,6 +121,7 @@ public abstract class Presenter<V extends Viewable>
 
   private void onAttached() {
     LOGGER.info("Presenter [" + this + "] : Attached.");
+    this.reveled = true;
     registerSlots();
     onRevealed();
     onReady();
@@ -143,6 +145,8 @@ public abstract class Presenter<V extends Viewable>
     if (active) {
       deactivate();
     }
+
+    this.reveled = false;
   }
 
   protected boolean isAutoReveal() {
@@ -336,6 +340,10 @@ public abstract class Presenter<V extends Viewable>
     if (isActive()) {
       onStateChanged();
     }
+  }
+
+  public boolean isReveled() {
+    return reveled;
   }
 
   public void setState() {}

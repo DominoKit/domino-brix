@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.security;
+package org.dominokit.brix.events;
 
-import java.util.Set;
-
-public interface HasRoles {
-  Set<String> getRoles();
+public interface BrixUser extends HasRoles {
+  boolean isAuthenticated();
 }

@@ -22,11 +22,12 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.dominokit.brix.events.BrixUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class SecurityContext {
+public class SecurityContext implements IsSecurityContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SecurityContext.class);
 
@@ -48,7 +49,7 @@ public class SecurityContext {
     return this;
   }
 
-  public void unauthorizedAccessHandler(Runnable handler) {
+  public void setUnauthorizedAccessHandler(Runnable handler) {
     this.unauthorizedAccessHandler = handler;
   }
 

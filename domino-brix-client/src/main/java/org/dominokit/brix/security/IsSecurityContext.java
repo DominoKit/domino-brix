@@ -15,13 +15,22 @@
  */
 package org.dominokit.brix.security;
 
-import org.dominokit.brix.events.HasRoles;
+import java.util.Collection;
+import java.util.Optional;
+import org.dominokit.brix.events.BrixUser;
 
-public class DenyAllAuthorizer implements Authorizer {
-  public static final Authorizer INSTANCE = new DenyAllAuthorizer();
+public interface IsSecurityContext {
+  <U extends BrixUser> Optional<U> getUser();
 
-  @Override
-  public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
-    return false;
-  }
+  boolean isAuthorizedFor(String role);
+
+  boolean isAuthorizedForAll(String... roles);
+
+  void reportUnAuthorizedAccess();
+
+  boolean isAuthorizedForAll(Collection<String> roles);
+
+  boolean isAuthorizedForAny(String... roles);
+
+  boolean isAuthorizedForAny(Collection<String> roles);
 }

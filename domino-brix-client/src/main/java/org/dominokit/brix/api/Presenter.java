@@ -28,12 +28,12 @@ import org.dominokit.brix.annotations.Global;
 import org.dominokit.brix.events.BrixEvent;
 import org.dominokit.brix.events.BrixEvents;
 import org.dominokit.brix.events.EventListener;
+import org.dominokit.brix.events.HasRoles;
 import org.dominokit.brix.events.RegistrationRecord;
 import org.dominokit.brix.security.Authorizer;
 import org.dominokit.brix.security.DefaultAuthorizer;
 import org.dominokit.brix.security.HasAuthorizer;
-import org.dominokit.brix.security.HasRoles;
-import org.dominokit.brix.security.SecurityContext;
+import org.dominokit.brix.security.IsSecurityContext;
 import org.dominokit.domino.history.AppHistory;
 import org.dominokit.domino.history.DominoHistory;
 import org.dominokit.domino.history.HistoryInterceptor;
@@ -54,7 +54,7 @@ public abstract class Presenter<V extends Viewable>
 
   @Inject @Global protected BrixSlots slots;
 
-  @Inject protected SecurityContext securityContext;
+  @Inject protected IsSecurityContext securityContext;
   @Inject @Global protected Config config;
 
   private RegistrationRecord eventsListenerRecord;

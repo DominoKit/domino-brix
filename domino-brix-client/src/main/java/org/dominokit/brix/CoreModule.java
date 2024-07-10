@@ -27,6 +27,7 @@ import org.dominokit.brix.api.Config;
 import org.dominokit.brix.api.ConfigImpl;
 import org.dominokit.brix.api.StartupTask;
 import org.dominokit.brix.events.BrixEvents;
+import org.dominokit.brix.security.IsSecurityContext;
 import org.dominokit.brix.security.SecurityContext;
 import org.dominokit.brix.tasks.TasksRunner;
 import org.dominokit.domino.client.history.StateHistory;
@@ -64,7 +65,7 @@ public class CoreModule {
 
   @Singleton
   @Provides
-  public SecurityContext securityContext() {
+  public IsSecurityContext securityContext() {
     return new SecurityContext();
   }
 

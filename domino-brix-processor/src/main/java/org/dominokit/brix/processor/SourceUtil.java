@@ -164,7 +164,7 @@ public class SourceUtil {
     TypeElement typeElement = (TypeElement) element;
     Optional<? extends TypeMirror> result =
         typeElement.getInterfaces().stream()
-            .filter(typeMirror -> isAssignableFrom(target, typeMirror))
+            .filter(typeMirror -> extendsInterface(typeMirror, target))
             .findFirst();
     if (result.isPresent()) {
       return result;
@@ -175,6 +175,15 @@ public class SourceUtil {
     } else {
       return findImplementedInterface(env.types().asElement(superclass), target);
     }
+  }
+
+  public boolean extendsInterface(TypeMirror typeMirror, Class<?> target) {
+    if (isAssignableFrom(target, typeMirror)) {
+      return true;
+    }
+
+    TypeElement element = (TypeElement) env.types().asElement(typeMirror);
+    return element.getInterfaces().stream().anyMatch(t -> extendsInterface(t, target));
   }
 
   /**
@@ -235,7 +244,7 @@ public class SourceUtil {
     if (superclass.getKind().equals(TypeKind.NONE)) {
       return Optional.empty();
     } else {
-      return findTypeArgument(env.types().asElement(superclass), target);
+      return findTypeArgument(superclass, target);
     }
   }
 

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.tests;
+package org.dominokit.brix.events;
 
-import org.dominokit.brix.annotations.BrixModule;
+import java.util.Set;
 
-@BrixModule("Shell")
-public class ShellModule {}
+public interface HasRoles {
+  Set<String> getRoles();
+}

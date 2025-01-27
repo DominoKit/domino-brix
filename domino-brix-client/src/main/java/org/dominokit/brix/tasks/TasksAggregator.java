@@ -19,22 +19,22 @@ import static java.util.Objects.nonNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.brix.api.BrixStartupTask;
 import org.dominokit.domino.api.shared.extension.ContextAggregator;
 
 public class TasksAggregator extends ContextAggregator.ContextWait<Void>
     implements Comparable<TasksAggregator> {
   private ContextAggregator contextAggregator;
-  private List<StartupTask> tasks;
+  private List<BrixStartupTask> tasks;
   private TasksAggregator nextAggregator;
   private Integer order;
 
-  public TasksAggregator(int order, List<StartupTask> tasks) {
+  public TasksAggregator(int order, List<BrixStartupTask> tasks) {
     this.order = order;
     this.tasks = tasks;
     this.contextAggregator =
         ContextAggregator.waitFor(
-                tasks.stream().map(StartupTask::getContextWait).collect(Collectors.toSet()))
+                tasks.stream().map(BrixStartupTask::getContextWait).collect(Collectors.toSet()))
             .onReady(
                 () -> {
                   complete(null);
@@ -50,7 +50,7 @@ public class TasksAggregator extends ContextAggregator.ContextWait<Void>
   }
 
   public void execute() {
-    tasks.forEach(StartupTask::run);
+    tasks.forEach(BrixStartupTask::run);
   }
 
   @Override

@@ -15,27 +15,6 @@
  */
 package org.dominokit.brix.api;
 
-import org.dominokit.domino.api.shared.extension.ContextAggregator;
-
-public abstract class StartupTask {
-
-  private final ContextAggregator.ContextWait<StartupTask> contextWait;
-
-  protected StartupTask() {
-    this.contextWait = new ContextAggregator.ContextWait<>();
-  }
-
-  public ContextAggregator.ContextWait<StartupTask> getContextWait() {
-    return contextWait;
-  }
-
-  public final void complete() {
-    contextWait.complete(this);
-  }
-
-  public abstract void run();
-
-  public int order() {
-    return 0;
-  }
+public interface HasUiHandlers<U extends UiHandlers> {
+  U getUiHandlers();
 }

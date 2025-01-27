@@ -15,7 +15,6 @@
  */
 package org.dominokit.brix.api;
 
-import elemental2.dom.DomGlobal;
 import org.dominokit.domino.history.AppHistory;
 import org.dominokit.domino.history.DominoHistory;
 
@@ -31,12 +30,6 @@ public abstract class AbstractRoutingTask<P extends Presenter<?>> implements Rou
           presenter.setRoutingState(state);
           presenter.activate();
         };
-    DomGlobal.console.info(
-        "}}}}}} -> Listening for presenter : "
-            + presenter.getClass().getCanonicalName()
-            + "["
-            + presenter
-            + "]");
-    this.history.listen(presenter.getTokenFilter(), listener);
+    //    this.history.listen(presenter.getTokenFilter(), listener);
   }
 }

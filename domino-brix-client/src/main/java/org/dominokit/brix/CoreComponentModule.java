@@ -13,8 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.security;
+package org.dominokit.brix;
 
-public interface BrixUser extends HasRoles {
-  boolean isAuthenticated();
+import dagger.Module;
+import javax.inject.Inject;
+
+@Module
+public class CoreComponentModule implements PresentationModule {
+  private CoreComponent coreComponent;
+
+  @Inject
+  public CoreComponentModule(CoreComponent coreComponent) {
+    this.coreComponent = coreComponent;
+  }
+
+  @Override
+  public CoreComponent coreComponent() {
+    return this.coreComponent;
+  }
 }

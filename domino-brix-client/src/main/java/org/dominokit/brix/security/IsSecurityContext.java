@@ -13,29 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.dominokit.brix.security;
 
-package org.dominokit.brix.api;
+import java.util.Collection;
+import org.dominokit.brix.events.BrixUser;
 
-public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V extends Viewable>
-    extends Presenter<V> {
-  private P parent;
+public interface IsSecurityContext {
+  BrixUser getUser();
 
-  public P getParent() {
-    return parent;
-  }
+  boolean isAuthenticated();
 
-  @Override
-  void doActivate() {
-    if (getParent().isActive()) {
-      super.doActivate();
-    } else {
-      getParent().registerChildListener(super::doActivate);
-    }
-  }
+  boolean isAuthorizedFor(String role);
 
-  public void setParent(P parent) {
-    this.parent = parent;
-  }
+  boolean isAuthorizedForAll(String... roles);
 
-  public void onBindParent(P parent) {}
+  void reportUnAuthorizedAccess();
+
+  boolean isAuthorizedForAll(Collection<String> roles);
+
+  boolean isAuthorizedForAny(String... roles);
+
+  boolean isAuthorizedForAny(Collection<String> roles);
 }

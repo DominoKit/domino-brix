@@ -36,7 +36,6 @@ import org.dominokit.brix.annotations.PathParameter;
 import org.dominokit.brix.annotations.QueryParameter;
 import org.dominokit.brix.annotations.RegisterSlots;
 import org.dominokit.brix.annotations.UiHandler;
-import org.dominokit.brix.annotations.UiView;
 import org.dominokit.brix.api.BrixSlots;
 import org.dominokit.brix.api.ChildPresenter;
 import org.dominokit.brix.tests.SampleEvent;
@@ -51,7 +50,7 @@ import org.dominokit.brix.tests.TestViewOne;
 public class TestPresenterOneChild extends ChildPresenter<TestPresenterOne, TestViewOne>
     implements TestViewOne.TestOneUiHandlers {
 
-  @UiView @Inject Lazy<TestViewOne> view;
+  @Inject Lazy<TestViewOne> view;
   @PathParameter String patha;
 
   @QueryParameter List<String> queryParam;

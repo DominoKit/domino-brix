@@ -15,11 +15,13 @@
  */
 package org.dominokit.brix.security;
 
+import org.dominokit.brix.events.HasRoles;
+
 public class DenyAllAuthorizer implements Authorizer {
   public static final Authorizer INSTANCE = new DenyAllAuthorizer();
 
   @Override
-  public boolean isAuthorized(SecurityContext context, HasRoles hasRoles) {
+  public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
     return false;
   }
 }

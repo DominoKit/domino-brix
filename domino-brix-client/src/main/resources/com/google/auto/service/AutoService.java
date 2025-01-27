@@ -1,6 +1,6 @@
 package com.google.auto.service;
 
-import com.google.common.annotations.GwtCompatible;
+import org.gwtproject.core.shared.GwtIncompatible;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

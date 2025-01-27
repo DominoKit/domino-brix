@@ -13,8 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix;
+package org.dominokit.brix.annotations;
 
-public interface ModuleComponent {
-  BrixModule module();
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.dominokit.brix.api.IsBrixComponent;
+import org.dominokit.brix.api.Presenter;
+
+@Retention(RetentionPolicy.CLASS)
+@Target({ElementType.TYPE})
+public @interface BrixComponent {
+
+  Class<? extends Presenter<?>> presenter();
+
+  Class<? extends IsBrixComponent> parent() default NonParent.class;
+
+  public final class NonParent implements IsBrixComponent {}
 }

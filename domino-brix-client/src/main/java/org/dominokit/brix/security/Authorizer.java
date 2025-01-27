@@ -15,6 +15,8 @@
  */
 package org.dominokit.brix.security;
 
+import org.dominokit.brix.events.HasRoles;
+
 public interface Authorizer {
-  boolean isAuthorized(SecurityContext context, HasRoles hasRoles);
+  boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles);
 }

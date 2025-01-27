@@ -20,17 +20,24 @@ import static java.util.Objects.isNull;
 import elemental2.dom.Element;
 import org.dominokit.brix.api.AttachableAware;
 import org.dominokit.brix.api.AttachableBinder;
+import org.dominokit.brix.api.HasUiHandlers;
 import org.dominokit.brix.api.UiHandlers;
 import org.dominokit.brix.api.View;
+import org.dominokit.brix.api.ViewablePopup;
 import org.dominokit.domino.ui.utils.BaseDominoElement;
 
 public abstract class BrixView<E extends Element, U extends UiHandlers>
-    extends BaseDominoElement<E, BrixView<E, U>> implements View {
+    extends BaseDominoElement<E, BrixView<E, U>> implements View, HasUiHandlers<U> {
 
   private AttachableBinder attachableBinder;
 
   protected U handlers() {
     return null;
+  }
+
+  @Override
+  public U getUiHandlers() {
+    return handlers();
   }
 
   @Override
@@ -56,6 +63,15 @@ public abstract class BrixView<E extends Element, U extends UiHandlers>
     @Override
     protected void initAttachable(AttachableAware attachableAware) {
       // Do nothing view attachable is already binded.
+    }
+  }
+
+  @Override
+  public void detach() {
+    if (this instanceof ViewablePopup) {
+      ((ViewablePopup) this).close();
+    } else {
+      remove();
     }
   }
 }

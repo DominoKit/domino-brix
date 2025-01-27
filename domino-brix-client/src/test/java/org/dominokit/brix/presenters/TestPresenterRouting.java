@@ -21,7 +21,6 @@ import org.dominokit.brix.annotations.Global;
 import org.dominokit.brix.api.RoutingTask;
 import org.dominokit.domino.history.AppHistory;
 import org.dominokit.domino.history.DominoHistory;
-import org.dominokit.domino.history.TokenFilter;
 
 @Singleton
 public class TestPresenterRouting implements RoutingTask {
@@ -37,7 +36,7 @@ public class TestPresenterRouting implements RoutingTask {
           presenter.queryParam = state.token().getQueryParameter("queryParam");
           presenter.activate();
         };
-    this.history.listen(TokenFilter.startsWith(presenter.getRoutingPath()), listener);
+    //    this.history.listen(TokenFilter.startsWith(presenter.getRoutingPath()), listener);
   }
 
   public void stop() {

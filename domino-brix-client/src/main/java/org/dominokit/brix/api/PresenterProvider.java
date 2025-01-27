@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.annotations;
+package org.dominokit.brix.api;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.inject.Qualifier;
+import dagger.Lazy;
 
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
-public @interface BrixRoutingTask {}
+public abstract class PresenterProvider<P extends Presenter<?>> {
+
+  private Lazy<P> presenter;
+
+  public PresenterProvider(Lazy<P> presenter) {
+    this.presenter = presenter;
+  }
+
+  public P get() {
+    return presenter.get();
+  }
+}

@@ -20,7 +20,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.dominokit.brix.annotations.BrixPresenter;
 import org.dominokit.brix.annotations.BrixRoute;
-import org.dominokit.brix.annotations.UiView;
 import org.dominokit.brix.api.Presenter;
 import org.dominokit.brix.tests.TestViewTwo;
 
@@ -30,5 +29,5 @@ import org.dominokit.brix.tests.TestViewTwo;
 public class TestPresenterTwo extends Presenter<TestViewTwo>
     implements TestViewTwo.TestTwoUiHandlers {
 
-  @UiView @Inject Lazy<TestViewTwo> view;
+  @Inject Lazy<TestViewTwo> view;
 }

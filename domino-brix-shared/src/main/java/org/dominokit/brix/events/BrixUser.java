@@ -13,21 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.task;
+package org.dominokit.brix.events;
 
-import org.dominokit.brix.annotations.BrixTask;
-import org.dominokit.brix.api.StartupTask;
-
-@BrixTask
-public class SampleTaskOne extends StartupTask {
-  @Override
-  public void run() {
-    System.out.println("Task one executed.");
-    complete();
-  }
-
-  @Override
-  public int order() {
-    return 10;
-  }
+public interface BrixUser extends HasRoles, UserProfile {
+  boolean isAuthenticated();
 }

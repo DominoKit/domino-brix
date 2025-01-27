@@ -13,21 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.tests;
+package org.dominokit.brix;
 
-import org.dominokit.brix.annotations.Task;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.brix.api.PresenterProvider;
 
-@Task
-public class SampleTaskOne extends StartupTask {
-  @Override
-  public void run() {
-    System.out.println("Task one executed.");
-    complete();
-  }
-
-  @Override
-  public int order() {
-    return 10;
-  }
+public interface HasPresenterProvider<P extends PresenterProvider<?>> {
+  P getPresenterProvider();
 }

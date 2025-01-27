@@ -13,29 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.dominokit.brix.api;
 
-public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V extends Viewable>
-    extends Presenter<V> {
-  private P parent;
-
-  public P getParent() {
-    return parent;
-  }
-
-  @Override
-  void doActivate() {
-    if (getParent().isActive()) {
-      super.doActivate();
-    } else {
-      getParent().registerChildListener(super::doActivate);
-    }
-  }
-
-  public void setParent(P parent) {
-    this.parent = parent;
-  }
-
-  public void onBindParent(P parent) {}
-}
+public interface IsBrixComponent {}

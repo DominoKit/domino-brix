@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.dominokit.brix.events;
 
-package org.dominokit.brix.api;
+import java.util.Map;
 
-public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V extends Viewable>
-    extends Presenter<V> {
-  private P parent;
+public interface UserProfile {
 
-  public P getParent() {
-    return parent;
-  }
+  String getId();
 
-  @Override
-  void doActivate() {
-    if (getParent().isActive()) {
-      super.doActivate();
-    } else {
-      getParent().registerChildListener(super::doActivate);
-    }
-  }
+  String getReference();
 
-  public void setParent(P parent) {
-    this.parent = parent;
-  }
+  String getUserName();
 
-  public void onBindParent(P parent) {}
+  String getFirstName();
+
+  String getLastName();
+
+  String getEmail();
+
+  Map<String, UserAttribute<?>> getAttributes();
 }

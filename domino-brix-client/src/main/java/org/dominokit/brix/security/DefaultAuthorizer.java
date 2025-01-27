@@ -15,12 +15,14 @@
  */
 package org.dominokit.brix.security;
 
+import org.dominokit.brix.events.HasRoles;
+
 public class DefaultAuthorizer implements Authorizer {
 
   public static final Authorizer INSTANCE = new DefaultAuthorizer();
 
   @Override
-  public boolean isAuthorized(SecurityContext context, HasRoles hasRoles) {
+  public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
     return true;
   }
 }

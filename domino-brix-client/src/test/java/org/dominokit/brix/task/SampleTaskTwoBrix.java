@@ -16,10 +16,10 @@
 package org.dominokit.brix.task;
 
 import org.dominokit.brix.annotations.BrixTask;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.brix.api.BrixStartupTask;
 
 @BrixTask
-public class SampleTaskTwo extends StartupTask {
+public class SampleTaskTwoBrix extends BrixStartupTask {
   @Override
   public void run() {
     System.out.println("Task two executed.");

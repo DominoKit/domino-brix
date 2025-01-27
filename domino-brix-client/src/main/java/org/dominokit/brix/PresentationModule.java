@@ -22,7 +22,7 @@ import org.dominokit.brix.annotations.Global;
 import org.dominokit.brix.api.BrixSlots;
 import org.dominokit.brix.api.Config;
 import org.dominokit.brix.events.BrixEvents;
-import org.dominokit.brix.security.SecurityContext;
+import org.dominokit.brix.security.IsSecurityContext;
 import org.dominokit.domino.history.AppHistory;
 
 @Module
@@ -60,7 +60,7 @@ public interface PresentationModule {
 
   @Singleton
   @Provides
-  default SecurityContext globalSecurityContext() {
+  default IsSecurityContext globalSecurityContext() {
     return coreComponent().core().getSecurityContext();
   }
 }

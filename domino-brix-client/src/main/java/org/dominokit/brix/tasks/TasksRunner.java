@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.brix.api.BrixStartupTask;
 import org.dominokit.domino.api.shared.extension.ContextAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +31,10 @@ public class TasksRunner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TasksRunner.class);
 
-  public void runTasks(Set<StartupTask> tasks, Runnable completeHandler) {
+  public void runTasks(Set<BrixStartupTask> tasks, Runnable completeHandler) {
     TreeSet<TasksAggregator> sorted =
         tasks.stream()
-            .collect(groupingBy(StartupTask::order))
+            .collect(groupingBy(BrixStartupTask::order))
             .entrySet()
             .stream()
             .map(taskEntry -> new TasksAggregator(taskEntry.getKey(), taskEntry.getValue()))

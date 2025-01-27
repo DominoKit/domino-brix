@@ -22,21 +22,21 @@ import static java.util.Objects.nonNull;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.inject.Inject;
 import org.dominokit.brix.annotations.Global;
 import org.dominokit.brix.events.BrixEvent;
 import org.dominokit.brix.events.BrixEvents;
 import org.dominokit.brix.events.EventListener;
+import org.dominokit.brix.events.HasRoles;
 import org.dominokit.brix.events.RegistrationRecord;
 import org.dominokit.brix.security.Authorizer;
 import org.dominokit.brix.security.DefaultAuthorizer;
 import org.dominokit.brix.security.HasAuthorizer;
-import org.dominokit.brix.security.HasRoles;
-import org.dominokit.brix.security.SecurityContext;
+import org.dominokit.brix.security.IsSecurityContext;
 import org.dominokit.domino.history.AppHistory;
 import org.dominokit.domino.history.DominoHistory;
 import org.dominokit.domino.history.HistoryInterceptor;
-import org.dominokit.domino.history.TokenFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +45,15 @@ public abstract class Presenter<V extends Viewable>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Presenter.class);
 
+  private final String ID = UUID.randomUUID().toString();
+
   @Inject @Global protected AppHistory globalRouter;
 
   @Inject @Global protected BrixEvents events;
 
   @Inject @Global protected BrixSlots slots;
 
-  @Inject protected SecurityContext securityContext;
+  @Inject protected IsSecurityContext securityContext;
   @Inject @Global protected Config config;
 
   private RegistrationRecord eventsListenerRecord;
@@ -63,9 +65,11 @@ public abstract class Presenter<V extends Viewable>
   private final Set<RegistrationRecord> registeredSlots = new HashSet<>();
   protected V view;
   private Set<ChildListener> childListeners = new HashSet<>();
+  private boolean reveled;
+  private ComponentProvider<?> componentProvider;
 
   public Presenter() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] have been created.");
+    LOGGER.debug("Presenter [" + this + "] have been created.");
   }
 
   private V getView() {
@@ -84,29 +88,13 @@ public abstract class Presenter<V extends Viewable>
     return null;
   }
 
-  public String getRoutingPath() {
-    return "";
-  }
-
-  TokenFilter tokenFilter() {
-    String path = getRoutingPath();
-    if (isNull(path) || path.trim().isEmpty()) {
-      return TokenFilter.any();
-    } else {
-      return TokenFilter.startsWithPathFilter(path);
-    }
-  }
-
-  public final TokenFilter getTokenFilter() {
-    return tokenFilter();
-  }
-
   protected void postConstruct() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : PostConstruct.");
+    LOGGER.info("Presenter [" + this + "] : PostConstruct.");
   }
 
   private void onAttached() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Attached.");
+    LOGGER.debug("Presenter [" + this + "] : Attached.");
+    this.reveled = true;
     registerSlots();
     onRevealed();
     onReady();
@@ -115,7 +103,7 @@ public abstract class Presenter<V extends Viewable>
   protected void registerSlots() {}
 
   private void onReady() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Ready.");
+    LOGGER.debug("Presenter [" + this + "] : Ready.");
     Set<ChildListener> temp = new HashSet<>(childListeners);
     temp.forEach(
         listener -> {
@@ -124,12 +112,20 @@ public abstract class Presenter<V extends Viewable>
         });
   }
 
+  void detach() {
+    if (nonNull(getView())) {
+      getView().detach();
+    }
+  }
+
   private void onDetached() {
-    LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Detached.");
+    LOGGER.debug("Presenter [" + this + "] : Detached.");
     onRemoved();
     if (active) {
       deactivate();
     }
+
+    this.reveled = false;
   }
 
   protected boolean isAutoReveal() {
@@ -139,17 +135,21 @@ public abstract class Presenter<V extends Viewable>
   @Override
   public void onEventReceived(BrixEvent event) {}
 
+  protected boolean isEnabled() {
+    return true;
+  }
+
   void doActivate() {
-    if (!active) {
+    if (!active && isEnabled()) {
       if (getAuthorizer().isAuthorized(securityContext, this)) {
-        LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Activating.");
+        LOGGER.debug("Presenter [" + this + "] : Activating.");
         slotListenerRecord = slots.listen(this);
         setAttachHandlers();
         setNavigationInterceptor();
         eventsListenerRecord = events.register(this);
         this.active = true;
         onActivated();
-        LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Activated.");
+        LOGGER.debug("Presenter [" + this + "] : Activated.");
         tryReveal();
       } else {
         securityContext.reportUnAuthorizedAccess();
@@ -184,7 +184,7 @@ public abstract class Presenter<V extends Viewable>
                   new ConfirmNavigationHandlers() {
                     @Override
                     public void onConfirmed() {
-                      LOGGER.info(
+                      LOGGER.debug(
                           "Presenter ["
                               + Presenter.this.getClass().getCanonicalName()
                               + "] : Navigation out confirmed.");
@@ -193,7 +193,7 @@ public abstract class Presenter<V extends Viewable>
 
                     @Override
                     public void onCanceled() {
-                      LOGGER.info(
+                      LOGGER.debug(
                           "Presenter ["
                               + Presenter.this.getClass().getCanonicalName()
                               + "] : Navigation out canceled.");
@@ -244,9 +244,9 @@ public abstract class Presenter<V extends Viewable>
     if (slot.isPresent()) {
       onBeforeRevealed();
       slot.get().reveal(getView());
-      LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Revealed.");
+      LOGGER.debug("Presenter [" + this.getClass().getCanonicalName() + "] : Revealed.");
     } else {
-      LOGGER.info(
+      LOGGER.debug(
           "Presenter slot ["
               + getSlotKey()
               + "] is not ready yet, waiting for slot to be registered.");
@@ -269,7 +269,7 @@ public abstract class Presenter<V extends Viewable>
     if (getView().isAttached()) {
       getSlot().ifPresent(slot -> slot.remove(getView()));
     } else {
-      LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivating.");
+      LOGGER.debug("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivating.");
       eventsListenerRecord.remove();
       slotListenerRecord.remove();
       if (nonNull(navigationInterceptor)) {
@@ -277,7 +277,8 @@ public abstract class Presenter<V extends Viewable>
       }
       this.active = false;
       onDeactivated();
-      LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivated.");
+      Optional.ofNullable(componentProvider).ifPresent(ComponentProvider::reset);
+      LOGGER.debug("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivated.");
     }
   }
 
@@ -321,6 +322,10 @@ public abstract class Presenter<V extends Viewable>
     }
   }
 
+  public boolean isReveled() {
+    return reveled;
+  }
+
   public void setState() {}
 
   void registerChildListener(ChildListener listener) {
@@ -329,5 +334,14 @@ public abstract class Presenter<V extends Viewable>
 
   interface ChildListener {
     void invoke();
+  }
+
+  void bindToComponent(ComponentProvider<?> componentProvider) {
+    this.componentProvider = componentProvider;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getCanonicalName() + "[" + ID + "]";
   }
 }

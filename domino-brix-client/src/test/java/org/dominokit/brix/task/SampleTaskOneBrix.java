@@ -13,10 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.security;
+package org.dominokit.brix.task;
 
-import java.util.Set;
+import org.dominokit.brix.annotations.BrixTask;
+import org.dominokit.brix.api.BrixStartupTask;
 
-public interface HasRoles {
-  Set<String> getRoles();
+@BrixTask
+public class SampleTaskOneBrix extends BrixStartupTask {
+  @Override
+  public void run() {
+    System.out.println("Task one executed.");
+    complete();
+  }
+
+  @Override
+  public int order() {
+    return 10;
+  }
 }

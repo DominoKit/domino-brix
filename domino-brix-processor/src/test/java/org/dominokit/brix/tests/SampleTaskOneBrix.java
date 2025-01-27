@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.annotations;
+package org.dominokit.brix.tests;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.inject.Qualifier;
+import org.dominokit.brix.api.BrixStartupTask;
 
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface Task {}
+public class SampleTaskOneBrix extends BrixStartupTask {
+  @Override
+  public void run() {
+    System.out.println("Task one executed.");
+    complete();
+  }
+
+  @Override
+  public int order() {
+    return 10;
+  }
+}

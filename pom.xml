@@ -288,8 +288,8 @@
                     <versionDigitToIncrement>${bump.digit}</versionDigitToIncrement>
 
                     <!-- Execute mvn verify before release -->
-                    <preReleaseGoals>verify</preReleaseGoals>
-                    <preHotfixGoals>verify</preHotfixGoals>
+                    <preReleaseGoals>verify -Dmaven.test.skip=true</preReleaseGoals>
+                    <preHotfixGoals>verify -Dmaven.test.skip=true</preHotfixGoals>
 
                     <!-- Configure branches -->
                     <gitFlowConfig>

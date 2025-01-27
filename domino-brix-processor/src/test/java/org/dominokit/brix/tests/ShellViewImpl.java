@@ -19,11 +19,11 @@ import elemental2.dom.HTMLDivElement;
 import javax.inject.Inject;
 import org.dominokit.brix.annotations.UiView;
 import org.dominokit.brix.api.Slot;
-import org.dominokit.brix.api.UiHandlers;
 import org.dominokit.brix.impl.BrixView;
 
 @UiView
-public class ShellViewImpl extends BrixView<HTMLDivElement, UiHandlers> implements TestViewOne {
+public class ShellViewImpl extends BrixView<HTMLDivElement, TestViewOne.TestOneUiHandlers>
+    implements TestViewOne {
 
   @Inject
   public ShellViewImpl() {}

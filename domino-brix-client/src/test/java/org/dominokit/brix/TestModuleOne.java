@@ -21,9 +21,9 @@ import dagger.multibindings.IntoSet;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.dominokit.brix.annotations.BrixTask;
-import org.dominokit.brix.api.StartupTask;
-import org.dominokit.brix.task.SampleTaskOne;
-import org.dominokit.brix.task.SampleTaskTwo;
+import org.dominokit.brix.api.BrixStartupTask;
+import org.dominokit.brix.task.SampleTaskOneBrix;
+import org.dominokit.brix.task.SampleTaskTwoBrix;
 import org.dominokit.domino.client.history.StateHistory;
 import org.dominokit.domino.history.AppHistory;
 
@@ -53,15 +53,15 @@ public class TestModuleOne implements PresentationModule {
   @Provides
   @IntoSet
   @BrixTask
-  public StartupTask taskOne() {
-    return new SampleTaskOne();
+  public BrixStartupTask taskOne() {
+    return new SampleTaskOneBrix();
   }
 
   @Singleton
   @Provides
   @IntoSet
   @BrixTask
-  public StartupTask taskTwo() {
-    return new SampleTaskTwo();
+  public BrixStartupTask taskTwo() {
+    return new SampleTaskTwoBrix();
   }
 }

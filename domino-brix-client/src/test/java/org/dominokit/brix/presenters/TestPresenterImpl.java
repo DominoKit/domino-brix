@@ -40,9 +40,9 @@ public class TestPresenterImpl extends TestPresenter {
 
   @Override
   public void onEventReceived(BrixEvent event) {}
-
-  @Override
-  public String getRoutingPath() {
-    return "presenters/test";
-  }
+  //
+  //  @Override
+  //  public String getRoutingPath() {
+  //    return "presenters/test";
+  //  }
 }

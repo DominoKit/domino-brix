@@ -29,6 +29,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.dominokit</groupId>
             <artifactId>domino-brix-shared</artifactId>
             <version>${project.version}</version>
@@ -72,6 +78,7 @@
             <artifactId>domino-auto-api</artifactId>
             <version>${domino.auto.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.dominokit/domino-aggregator-shared -->
     </dependencies>
 
     <build>

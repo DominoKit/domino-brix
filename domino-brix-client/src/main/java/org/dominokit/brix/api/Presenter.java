@@ -37,7 +37,6 @@ import org.dominokit.brix.security.IsSecurityContext;
 import org.dominokit.domino.history.AppHistory;
 import org.dominokit.domino.history.DominoHistory;
 import org.dominokit.domino.history.HistoryInterceptor;
-import org.dominokit.domino.history.TokenFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +66,10 @@ public abstract class Presenter<V extends Viewable>
   protected V view;
   private Set<ChildListener> childListeners = new HashSet<>();
   private boolean reveled;
+  private ComponentProvider<?> componentProvider;
 
   public Presenter() {
-    LOGGER.info("Presenter [" + this + "] have been created.");
+    LOGGER.debug("Presenter [" + this + "] have been created.");
   }
 
   private V getView() {
@@ -88,39 +88,12 @@ public abstract class Presenter<V extends Viewable>
     return null;
   }
 
-  public String getRoutingPath() {
-    return "";
-  }
-
-  protected boolean isHashBasedRouting() {
-    String path = getRoutingPath();
-    if (nonNull(path) && !path.isEmpty()) {
-      return path.contains("#");
-    }
-    return false;
-  }
-
-  protected TokenFilter tokenFilter() {
-    String path = getRoutingPath();
-    if (isNull(path) || path.trim().isEmpty()) {
-      return TokenFilter.any();
-    } else {
-      return isHashBasedRouting()
-          ? TokenFilter.startsWithFragment(path)
-          : TokenFilter.startsWithPathFilter(path);
-    }
-  }
-
-  public final TokenFilter getTokenFilter() {
-    return tokenFilter();
-  }
-
   protected void postConstruct() {
     LOGGER.info("Presenter [" + this + "] : PostConstruct.");
   }
 
   private void onAttached() {
-    LOGGER.info("Presenter [" + this + "] : Attached.");
+    LOGGER.debug("Presenter [" + this + "] : Attached.");
     this.reveled = true;
     registerSlots();
     onRevealed();
@@ -130,7 +103,7 @@ public abstract class Presenter<V extends Viewable>
   protected void registerSlots() {}
 
   private void onReady() {
-    LOGGER.info("Presenter [" + this + "] : Ready.");
+    LOGGER.debug("Presenter [" + this + "] : Ready.");
     Set<ChildListener> temp = new HashSet<>(childListeners);
     temp.forEach(
         listener -> {
@@ -139,8 +112,14 @@ public abstract class Presenter<V extends Viewable>
         });
   }
 
+  void detach() {
+    if (nonNull(getView())) {
+      getView().detach();
+    }
+  }
+
   private void onDetached() {
-    LOGGER.info("Presenter [" + this + "] : Detached.");
+    LOGGER.debug("Presenter [" + this + "] : Detached.");
     onRemoved();
     if (active) {
       deactivate();
@@ -163,14 +142,14 @@ public abstract class Presenter<V extends Viewable>
   void doActivate() {
     if (!active && isEnabled()) {
       if (getAuthorizer().isAuthorized(securityContext, this)) {
-        LOGGER.info("Presenter [" + this + "] : Activating.");
+        LOGGER.debug("Presenter [" + this + "] : Activating.");
         slotListenerRecord = slots.listen(this);
         setAttachHandlers();
         setNavigationInterceptor();
         eventsListenerRecord = events.register(this);
         this.active = true;
         onActivated();
-        LOGGER.info("Presenter [" + this + "] : Activated.");
+        LOGGER.debug("Presenter [" + this + "] : Activated.");
         tryReveal();
       } else {
         securityContext.reportUnAuthorizedAccess();
@@ -205,7 +184,7 @@ public abstract class Presenter<V extends Viewable>
                   new ConfirmNavigationHandlers() {
                     @Override
                     public void onConfirmed() {
-                      LOGGER.info(
+                      LOGGER.debug(
                           "Presenter ["
                               + Presenter.this.getClass().getCanonicalName()
                               + "] : Navigation out confirmed.");
@@ -214,7 +193,7 @@ public abstract class Presenter<V extends Viewable>
 
                     @Override
                     public void onCanceled() {
-                      LOGGER.info(
+                      LOGGER.debug(
                           "Presenter ["
                               + Presenter.this.getClass().getCanonicalName()
                               + "] : Navigation out canceled.");
@@ -265,9 +244,9 @@ public abstract class Presenter<V extends Viewable>
     if (slot.isPresent()) {
       onBeforeRevealed();
       slot.get().reveal(getView());
-      LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Revealed.");
+      LOGGER.debug("Presenter [" + this.getClass().getCanonicalName() + "] : Revealed.");
     } else {
-      LOGGER.info(
+      LOGGER.debug(
           "Presenter slot ["
               + getSlotKey()
               + "] is not ready yet, waiting for slot to be registered.");
@@ -290,7 +269,7 @@ public abstract class Presenter<V extends Viewable>
     if (getView().isAttached()) {
       getSlot().ifPresent(slot -> slot.remove(getView()));
     } else {
-      LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivating.");
+      LOGGER.debug("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivating.");
       eventsListenerRecord.remove();
       slotListenerRecord.remove();
       if (nonNull(navigationInterceptor)) {
@@ -298,7 +277,8 @@ public abstract class Presenter<V extends Viewable>
       }
       this.active = false;
       onDeactivated();
-      LOGGER.info("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivated.");
+      Optional.ofNullable(componentProvider).ifPresent(ComponentProvider::reset);
+      LOGGER.debug("Presenter [" + this.getClass().getCanonicalName() + "] : Deactivated.");
     }
   }
 
@@ -354,6 +334,10 @@ public abstract class Presenter<V extends Viewable>
 
   interface ChildListener {
     void invoke();
+  }
+
+  void bindToComponent(ComponentProvider<?> componentProvider) {
+    this.componentProvider = componentProvider;
   }
 
   @Override

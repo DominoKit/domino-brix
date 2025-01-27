@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.task;
+package org.dominokit.brix.tests;
 
-import org.dominokit.brix.annotations.BrixTask;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.brix.api.BrixStartupTask;
 
-@BrixTask
-public class SampleTaskOne extends StartupTask {
+public class SampleTaskOneBrix extends BrixStartupTask {
   @Override
   public void run() {
     System.out.println("Task one executed.");

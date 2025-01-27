@@ -15,6 +15,6 @@
  */
 package org.dominokit.brix.events;
 
-public interface BrixUser extends HasRoles {
+public interface BrixUser extends HasRoles, UserProfile {
   boolean isAuthenticated();
 }

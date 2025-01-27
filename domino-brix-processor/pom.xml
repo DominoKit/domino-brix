@@ -86,10 +86,18 @@
                                     <exclude>com.google.j2objc:j2objc-annotations</exclude>
                                     <exclude>com.google.errorprone:error_prone_annotations</exclude>
                                     <exclude>com.fasterxml.jackson.core:*</exclude>
+                                    <exclude>com.google.auto:*</exclude>
+                                    <exclude>com.google.auto.service:*</exclude>
+                                    <exclude>com.google.guava:*</exclude>
+                                    <exclude>com.google.dagger:*</exclude>
+                                    <exclude>javax.inject:*</exclude>
                                 </excludes>
                             </artifactSet>
                             <relocations>
-
+                                <relocation>
+                                    <pattern>com.squareup</pattern>
+                                    <shadedPattern>dominobrix.shaded.com.squareup</shadedPattern>
+                                </relocation>
                             </relocations>
                             <transformers>
                                 <transformer

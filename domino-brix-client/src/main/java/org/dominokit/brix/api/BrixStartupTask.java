@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.task;
+package org.dominokit.brix.api;
 
-import org.dominokit.brix.annotations.BrixTask;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.domino.api.shared.extension.ContextAggregator;
 
-@BrixTask
-public class SampleTaskThree extends StartupTask {
-  @Override
-  public void run() {
-    System.out.println("Task three executed.");
-    complete();
+public abstract class BrixStartupTask {
+
+  private final ContextAggregator.ContextWait<BrixStartupTask> contextWait;
+
+  protected BrixStartupTask() {
+    this.contextWait = new ContextAggregator.ContextWait<>();
   }
 
-  @Override
+  public ContextAggregator.ContextWait<BrixStartupTask> getContextWait() {
+    return contextWait;
+  }
+
+  public final void complete() {
+    contextWait.complete(this);
+  }
+
+  public abstract void run();
+
   public int order() {
-    return 10;
+    return 0;
   }
 }

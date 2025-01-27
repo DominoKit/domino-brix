@@ -19,4 +19,6 @@ public interface Viewable {
   boolean isAttached();
 
   String getId();
+
+  void detach();
 }

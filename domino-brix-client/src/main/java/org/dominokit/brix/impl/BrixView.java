@@ -23,6 +23,7 @@ import org.dominokit.brix.api.AttachableBinder;
 import org.dominokit.brix.api.HasUiHandlers;
 import org.dominokit.brix.api.UiHandlers;
 import org.dominokit.brix.api.View;
+import org.dominokit.brix.api.ViewablePopup;
 import org.dominokit.domino.ui.utils.BaseDominoElement;
 
 public abstract class BrixView<E extends Element, U extends UiHandlers>
@@ -62,6 +63,15 @@ public abstract class BrixView<E extends Element, U extends UiHandlers>
     @Override
     protected void initAttachable(AttachableAware attachableAware) {
       // Do nothing view attachable is already binded.
+    }
+  }
+
+  @Override
+  public void detach() {
+    if (this instanceof ViewablePopup) {
+      ((ViewablePopup) this).close();
+    } else {
+      remove();
     }
   }
 }

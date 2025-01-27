@@ -18,11 +18,11 @@ package org.dominokit.brix.tests;
 import elemental2.dom.HTMLDivElement;
 import javax.inject.Inject;
 import org.dominokit.brix.annotations.UiView;
-import org.dominokit.brix.api.UiHandlers;
 import org.dominokit.brix.impl.BrixView;
 
 @UiView
-public class ShellView2Impl extends BrixView<HTMLDivElement, UiHandlers> {
+public class ShellView2Impl extends BrixView<HTMLDivElement, TestViewTwo.TestTwoUiHandlers>
+    implements TestViewTwo {
 
   @Inject
   public ShellView2Impl() {}

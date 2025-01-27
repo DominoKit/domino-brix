@@ -15,9 +15,12 @@
  */
 package org.dominokit.brix;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import javax.inject.Inject;
 import org.dominokit.brix.api.BrixSlots;
+import org.dominokit.brix.api.BrixStartupTask;
 import org.dominokit.brix.api.Config;
 import org.dominokit.brix.events.BrixEvents;
 import org.dominokit.domino.history.AppHistory;
@@ -32,11 +35,6 @@ public class Brix {
   @Inject
   public Brix(CoreComponent coreComponent) {
     this.coreComponent = coreComponent;
-  }
-
-  public Brix register(BrixModuleAdapter module) {
-    module.init(coreComponent);
-    return this;
   }
 
   public CoreComponent getCoreComponent() {
@@ -67,7 +65,7 @@ public class Brix {
     coreComponent.core().init(config);
   }
 
-  public void start(Runnable handler) {
-    coreComponent.core().start(handler);
+  public void start(Collection<BrixStartupTask> tasks, Runnable handler) {
+    coreComponent.core().start(new HashSet<>(tasks), handler);
   }
 }

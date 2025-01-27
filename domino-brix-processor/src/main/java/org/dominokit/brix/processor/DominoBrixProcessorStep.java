@@ -23,7 +23,6 @@ package org.dominokit.brix.processor;
 import static java.util.Objects.nonNull;
 
 import com.google.auto.common.BasicAnnotationProcessor;
-import com.google.auto.common.MoreTypes;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Sets;
 import com.squareup.javapoet.AnnotationSpec;
@@ -39,7 +38,6 @@ import com.squareup.javapoet.TypeSpec;
 import dagger.Binds;
 import dagger.Lazy;
 import dagger.Module;
-import dagger.multibindings.IntoSet;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -69,16 +67,11 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
-import org.dominokit.brix.Brix;
-import org.dominokit.brix.CoreComponent;
-import org.dominokit.brix.PresentationModule;
-import org.dominokit.brix.annotations.BrixModule;
+import org.dominokit.brix.annotations.BrixComponent;
 import org.dominokit.brix.annotations.BrixPresenter;
 import org.dominokit.brix.annotations.BrixRoute;
 import org.dominokit.brix.annotations.BrixSlot;
-import org.dominokit.brix.annotations.BrixTask;
 import org.dominokit.brix.annotations.FragmentParameter;
-import org.dominokit.brix.annotations.Global;
 import org.dominokit.brix.annotations.Handlers;
 import org.dominokit.brix.annotations.ListenFor;
 import org.dominokit.brix.annotations.OnActivated;
@@ -90,17 +83,16 @@ import org.dominokit.brix.annotations.OnStateChanged;
 import org.dominokit.brix.annotations.PathParameter;
 import org.dominokit.brix.annotations.QueryParameter;
 import org.dominokit.brix.annotations.RegisterSlots;
-import org.dominokit.brix.annotations.Task;
 import org.dominokit.brix.annotations.UiHandler;
 import org.dominokit.brix.annotations.UiView;
-import org.dominokit.brix.api.AbstractChildRoutingTask;
-import org.dominokit.brix.api.AbstractRoutingTask;
 import org.dominokit.brix.api.BrixComponentInitializer;
 import org.dominokit.brix.api.ChildPresenter;
+import org.dominokit.brix.api.ChildPresenterRouting;
 import org.dominokit.brix.api.Presenter;
-import org.dominokit.brix.api.RoutingTask;
+import org.dominokit.brix.api.PresenterProvider;
+import org.dominokit.brix.api.RouterManager;
+import org.dominokit.brix.api.RoutingProvider;
 import org.dominokit.brix.api.Slot;
-import org.dominokit.brix.api.StartupTask;
 import org.dominokit.brix.api.UiHandlers;
 import org.dominokit.brix.api.Viewable;
 import org.dominokit.brix.events.BrixEvent;
@@ -108,7 +100,6 @@ import org.dominokit.brix.security.Authorizer;
 import org.dominokit.brix.security.DenyAllAuthorizer;
 import org.dominokit.brix.security.PermitAllAuthorizer;
 import org.dominokit.brix.security.RolesAllowedAuthorizer;
-import org.dominokit.domino.history.AppHistory;
 
 public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, HasProcessorEnv {
 
@@ -124,8 +115,7 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
   public Set<String> annotations() {
     return new HashSet<>(
         Arrays.asList(
-            BrixModule.class.getCanonicalName(),
-            Task.class.getCanonicalName(),
+            BrixComponent.class.getCanonicalName(),
             BrixPresenter.class.getCanonicalName(),
             UiView.class.getCanonicalName()));
   }
@@ -144,144 +134,165 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
   }
 
   private void processModule(ImmutableSetMultimap<String, Element> elementsByAnnotation) {
-    elementsByAnnotation
-        .get(BrixModule.class.getCanonicalName())
-        .forEach(
-            element -> {
-              BrixModule brixModule = element.getAnnotation(BrixModule.class);
-              String moduleName = brixModule.value();
 
-              TypeSpec.Builder bindingModule =
-                  TypeSpec.interfaceBuilder(
-                      "Brix" + sourceUtil.capitalizeFirstLetter(moduleName) + "BindingModule_");
-              bindingModule.addModifiers(Modifier.PUBLIC).addAnnotation(Module.class);
+    elementsByAnnotation
+        .get(BrixPresenter.class.getCanonicalName())
+        .forEach(
+            presenter -> {
+              TypeSpec.Builder presenterBuilder =
+                  TypeSpec.classBuilder(presenter.getSimpleName().toString() + "Impl");
+              presenterBuilder
+                  .addAnnotation(Singleton.class)
+                  .superclass(TypeName.get(presenter.asType()))
+                  .addModifiers(Modifier.PUBLIC);
+
+              addViewField(presenter, presenterBuilder);
+
+              copyQualifiers(presenter, presenterBuilder);
+              copyConstructors(presenter, presenterBuilder);
+              generateUiHandlers(presenter, presenterBuilder);
+              generateSlotMethod(presenter, presenterBuilder);
+              generateRegisterSlotsInterface(presenter, presenterBuilder);
+              collectAnnotatedMethods(
+                  presenter, presenterBuilder, PostConstruct.class, "postConstruct");
+              collectAnnotatedMethods(presenter, presenterBuilder, OnReveal.class, "onRevealed");
+              collectAnnotatedMethods(presenter, presenterBuilder, OnRemove.class, "onRemoved");
+              collectAnnotatedMethods(
+                  presenter, presenterBuilder, OnBeforeReveal.class, "onBeforeRevealed");
+              collectAnnotatedMethods(
+                  presenter, presenterBuilder, OnActivated.class, "onActivated");
+              collectAnnotatedMethods(
+                  presenter, presenterBuilder, OnDeactivated.class, "onDeactivated");
+              collectAnnotatedMethods(
+                  presenter, presenterBuilder, OnStateChanged.class, "onStateChanged");
+              generateStateMethod(presenter, presenterBuilder);
+              generateEventsMethod(presenter, presenterBuilder);
+
+              generateAuthorizerMethod(presenter, presenterBuilder);
+              TypeSpec.Builder providerBuilder = generateProviderClass(presenter);
+
+              writeFile(providerBuilder.build(), presenter);
 
               TypeSpec.Builder superModule =
-                  TypeSpec.classBuilder(
-                      "Brix" + sourceUtil.capitalizeFirstLetter(moduleName) + "Module_");
-              superModule
-                  .addModifiers(Modifier.PUBLIC)
-                  .addAnnotation(Module.class)
-                  .addSuperinterface(TypeName.get(PresentationModule.class))
-                  .addField(
-                      FieldSpec.builder(
-                              TypeName.get(CoreComponent.class), "coreComponent", Modifier.PRIVATE)
-                          .build())
-                  .addMethod(
-                      MethodSpec.constructorBuilder()
-                          .addAnnotation(Inject.class)
-                          .addModifiers(Modifier.PUBLIC)
-                          .addParameter(
-                              ParameterSpec.builder(
-                                      TypeName.get(CoreComponent.class), "coreComponent")
-                                  .build())
-                          .addStatement("this.coreComponent = coreComponent")
-                          .build())
-                  .addMethod(
-                      MethodSpec.methodBuilder("coreComponent")
-                          .addAnnotation(Override.class)
-                          .addModifiers(Modifier.PUBLIC)
-                          .returns(CoreComponent.class)
-                          .addStatement("return this.coreComponent")
-                          .build());
-
-              TypeSpec typeSpec = generateStartupTasks(moduleName, elementsByAnnotation);
-              writeFile(typeSpec, element);
-
-              elementsByAnnotation
-                  .get(BrixPresenter.class.getCanonicalName())
-                  .forEach(
-                      presenter -> {
-                        TypeSpec.Builder presenterBuilder =
-                            TypeSpec.classBuilder(presenter.getSimpleName().toString() + "Impl");
-                        presenterBuilder
-                            .addAnnotation(Singleton.class)
-                            .superclass(TypeName.get(presenter.asType()))
-                            .addModifiers(Modifier.PUBLIC);
-
-                        addViewField(presenter, presenterBuilder);
-
-                        copyQualifiers(presenter, presenterBuilder);
-                        copyConstructors(presenter, presenterBuilder);
-                        generateUiHandlers(presenter, presenterBuilder);
-                        generateRouteMethod(presenter, presenterBuilder);
-                        generateSlotMethod(presenter, presenterBuilder);
-                        collectAnnotatedMethods(
-                            presenter, presenterBuilder, PostConstruct.class, "postConstruct");
-                        collectAnnotatedMethods(
-                            presenter, presenterBuilder, OnReveal.class, "onRevealed");
-                        collectAnnotatedMethods(
-                            presenter, presenterBuilder, OnRemove.class, "onRemoved");
-                        collectAnnotatedMethods(
-                            presenter, presenterBuilder, OnBeforeReveal.class, "onBeforeRevealed");
-                        collectAnnotatedMethods(
-                            presenter, presenterBuilder, OnActivated.class, "onActivated");
-                        collectAnnotatedMethods(
-                            presenter, presenterBuilder, OnDeactivated.class, "onDeactivated");
-                        collectAnnotatedMethods(
-                            presenter, presenterBuilder, OnStateChanged.class, "onStateChanged");
-                        generateStateMethod(presenter, presenterBuilder);
-                        generateEventsMethod(presenter, presenterBuilder);
-                        generateRegisterSlotsMethod(presenter, presenterBuilder);
-                        generateAuthorizerMethod(presenter, presenterBuilder);
-
-                        writeFile(presenterBuilder.build(), presenter);
-                        generatePresenterBinding(presenter, bindingModule);
-                        generateRoutingTask(presenter, bindingModule);
-                      });
-
-              elementsByAnnotation.get(UiView.class.getCanonicalName()).stream()
-                  .filter(e -> ElementKind.FIELD != e.getKind())
-                  .forEach(
-                      uiView -> {
-                        TypeSpec.Builder builder =
-                            TypeSpec.classBuilder(uiView.getSimpleName().toString() + "_UiView");
-                        copyQualifiers(uiView, builder);
-                        builder
-                            .addModifiers(Modifier.PUBLIC)
-                            .superclass(TypeName.get(uiView.asType()));
-                        addUIHandlersField(uiView, builder);
-                        copyConstructors(uiView, builder);
-
-                        writeFile(builder.build(), uiView);
-                        generateViewBinding(uiView, bindingModule);
-                      });
-
-              sourceUtil
-                  .getClassValueFromAnnotation(element, BrixModule.class, "component")
-                  .ifPresent(
-                      component -> {
-                        if (!MoreTypes.isTypeOf(BrixModule.NoneComponent.class, component)) {
-                          TypeSpec.Builder componentService =
-                              TypeSpec.classBuilder(
-                                      "Brix"
-                                          + sourceUtil.capitalizeFirstLetter(moduleName)
-                                          + "ComponentService_")
-                                  .addAnnotation(
-                                      AnnotationSpec.builder(
-                                              com.google.auto.service.AutoService.class)
-                                          .addMember(
-                                              "value", "$T.class", BrixComponentInitializer.class)
-                                          .build())
-                                  .addModifiers(Modifier.PUBLIC)
-                                  .addSuperinterface(BrixComponentInitializer.class)
-                                  .addMethod(
-                                      MethodSpec.methodBuilder("init")
-                                          .addAnnotation(Override.class)
-                                          .addModifiers(Modifier.PUBLIC)
-                                          .returns(TypeName.VOID)
-                                          .addStatement(
-                                              "$T.get().register($T.getInstance().module())",
-                                              Brix.class,
-                                              component)
-                                          .build());
-                          writeFile(componentService.build(), element);
-                        }
-                      });
-
-              writeFile(bindingModule.build(), element);
-              writeFile(superModule.build(), element);
+                  TypeSpec.interfaceBuilder(
+                      "Brix" + presenter.getSimpleName().toString() + "Module_");
+              superModule.addModifiers(Modifier.PUBLIC).addAnnotation(Module.class);
+              writeFile(presenterBuilder.build(), presenter);
+              generatePresenterBinding(presenter, superModule);
+              writeFile(superModule.build(), presenter);
+              Optional<TypeSpec.Builder> routingSpec = generateRoutingClass(presenter);
+              routingSpec.ifPresent(builder -> writeFile(builder.build(), presenter));
             });
+
+    elementsByAnnotation.get(UiView.class.getCanonicalName()).stream()
+        .filter(e -> ElementKind.FIELD != e.getKind())
+        .forEach(
+            uiView -> {
+              TypeSpec.Builder superModule =
+                  TypeSpec.interfaceBuilder(
+                      "Brix" + uiView.getSimpleName().toString().replace("Impl", "") + "Module_");
+              superModule.addModifiers(Modifier.PUBLIC).addAnnotation(Module.class);
+
+              TypeSpec.Builder builder =
+                  TypeSpec.classBuilder(uiView.getSimpleName().toString() + "_UiView");
+              copyQualifiers(uiView, builder);
+              builder.addModifiers(Modifier.PUBLIC).superclass(TypeName.get(uiView.asType()));
+              addUIHandlersField(uiView, builder);
+              copyConstructors(uiView, builder);
+
+              writeFile(builder.build(), uiView);
+              generateViewBinding(uiView, superModule);
+              writeFile(superModule.build(), uiView);
+            });
+
+    elementsByAnnotation.get(BrixComponent.class.getCanonicalName()).stream()
+        .filter(e -> ElementKind.FIELD != e.getKind())
+        .forEach(component -> writeFile(generateComponentService(component).build(), component));
+  }
+
+  private TypeSpec.Builder generateComponentService(Element brixComponent) {
+    Optional<TypeMirror> presenterType =
+        sourceUtil.getClassValueFromAnnotation(brixComponent, BrixComponent.class, "presenter");
+    Element presenterElement = types().asElement(presenterType.get());
+
+    MethodSpec.Builder initMethod =
+        MethodSpec.methodBuilder("init")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(TypeName.VOID);
+
+    boolean childPresenter =
+        sourceUtil.isAssignableFrom(ChildPresenter.class, presenterElement.asType());
+    if (childPresenter) {
+      Optional<TypeMirror> parentType =
+          sourceUtil.getClassValueFromAnnotation(brixComponent, BrixComponent.class, "parent");
+
+      if (!parentType.isPresent()) {
+        messager()
+            .printMessage(
+                Diagnostic.Kind.ERROR,
+                "No parent component provided for a child component",
+                brixComponent);
+      }
+
+      initMethod.addStatement(
+          "$T.initRoute(new $T(), $T.PROVIDER, $T.PROVIDER)",
+          RouterManager.class,
+          getPresenterRouter(presenterElement),
+          TypeName.get(brixComponent.asType()),
+          TypeName.get(parentType.get()));
+    } else {
+      initMethod.addStatement(
+          "$T.initRoute(new $T(), $T.PROVIDER)",
+          RouterManager.class,
+          getPresenterRouter(presenterElement),
+          TypeName.get(brixComponent.asType()));
+    }
+
+    return TypeSpec.classBuilder(presenterElement.getSimpleName().toString() + "ComponentService_")
+        .addAnnotation(
+            AnnotationSpec.builder(com.google.auto.service.AutoService.class)
+                .addMember("value", "$T.class", BrixComponentInitializer.class)
+                .build())
+        .addModifiers(Modifier.PUBLIC)
+        .addSuperinterface(BrixComponentInitializer.class)
+        .addMethod(initMethod.build());
+  }
+
+  private ClassName getPresenterRouter(Element presenterElement) {
+
+    Optional<TypeMirror> router =
+        sourceUtil.getClassValueFromAnnotation(presenterElement, BrixRoute.class, "router");
+    if (router.isPresent()
+        && !sourceUtil.isAssignableFrom(BrixRoute.UnspecifiedRouter.class, router.get())) {
+      return ClassName.get((TypeElement) types().asElement(router.get()));
+    } else {
+      return guessImpl(presenterElement, "Routing");
+    }
+  }
+
+  private TypeSpec.Builder generateProviderClass(Element presenter) {
+    TypeSpec.Builder providerBuilder =
+        TypeSpec.classBuilder(presenter.getSimpleName().toString() + "Provider")
+            .superclass(
+                ParameterizedTypeName.get(
+                    ClassName.get(PresenterProvider.class), TypeName.get(presenter.asType())));
+
+    ParameterSpec.Builder providerParam =
+        ParameterSpec.builder(
+            ParameterizedTypeName.get(ClassName.get(Lazy.class), TypeName.get(presenter.asType())),
+            "provider");
+
+    providerBuilder
+        .addModifiers(Modifier.PUBLIC)
+        .addMethod(
+            MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Inject.class)
+                .addParameter(providerParam.build())
+                .addStatement("super(provider)")
+                .build());
+    return providerBuilder;
   }
 
   private static void copyQualifiers(Element element, TypeSpec.Builder builder) {
@@ -448,19 +459,6 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
     }
   }
 
-  private void generateRouteMethod(Element presenter, TypeSpec.Builder presenterBuilder) {
-    BrixRoute route = sourceUtil.findClassAnnotation(presenter, BrixRoute.class);
-    if (nonNull(route) && nonNull(route.value()) && !route.value().trim().isEmpty()) {
-      presenterBuilder.addMethod(
-          MethodSpec.methodBuilder("getRoutingPath")
-              .addAnnotation(Override.class)
-              .addModifiers(Modifier.PUBLIC)
-              .returns(String.class)
-              .addStatement("return $S", route.value())
-              .build());
-    }
-  }
-
   private void generateSlotMethod(Element presenter, TypeSpec.Builder presenterBuilder) {
     BrixSlot slot = sourceUtil.findClassAnnotation(presenter, BrixSlot.class);
     if (nonNull(slot) && nonNull(slot.value()) && !slot.value().trim().isEmpty()) {
@@ -477,12 +475,13 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
   private void generateUiHandlers(Element presenter, TypeSpec.Builder presenterBuilder) {
     List<Element> methods = sourceUtil.getAnnotatedMethods(presenter.asType(), UiHandler.class);
 
+    String name = presenter.getSimpleName().toString() + "UiHandlers";
+    TypeSpec.Builder builder =
+        TypeSpec.interfaceBuilder(name)
+            .addModifiers(Modifier.PUBLIC)
+            .addSuperinterface(UiHandlers.class);
+
     if (!methods.isEmpty()) {
-      String name = presenter.getSimpleName().toString() + "UiHandlers";
-      TypeSpec.Builder builder =
-          TypeSpec.interfaceBuilder(name)
-              .addModifiers(Modifier.PUBLIC)
-              .addSuperinterface(UiHandlers.class);
       methods.stream()
           .map(element -> (ExecutableElement) element)
           .forEach(
@@ -504,11 +503,11 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
                         });
                 builder.addMethod(interfaceMethod.build());
               });
-      processingEnv
-          .getMessager()
-          .printMessage(Diagnostic.Kind.NOTE, "======= > Writing uiHandlers : " + name);
-      writeFile(builder.build(), presenter);
     }
+    processingEnv
+        .getMessager()
+        .printMessage(Diagnostic.Kind.NOTE, "======= > Writing uiHandlers : " + name);
+    writeFile(builder.build(), presenter);
   }
 
   private void collectAnnotatedMethods(
@@ -529,7 +528,8 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
     }
   }
 
-  private void generateRegisterSlotsMethod(Element presenter, TypeSpec.Builder presenterBuilder) {
+  private void generateRegisterSlotsInterface(
+      Element presenter, TypeSpec.Builder presenterBuilder) {
     if (nonNull(sourceUtil.findClassAnnotation(presenter, RegisterSlots.class))) {
       List<String> slots =
           Arrays.asList(sourceUtil.findClassAnnotation(presenter, RegisterSlots.class).value());
@@ -725,26 +725,47 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
   private void generatePresenterBinding(Element presenter, TypeSpec.Builder bindingModule) {
 
     Set<? extends AnnotationMirror> qualifiers = getQualifiers(presenter);
+
+    ParameterSpec.Builder presenterParam =
+        ParameterSpec.builder(guessImpl(presenter, "Impl"), "impl");
+
+    MethodSpec.Builder bindPresenter =
+        MethodSpec.methodBuilder(sourceUtil.smallFirstLetter(presenter.getSimpleName().toString()))
+            .addAnnotation(Singleton.class)
+            .addAnnotation(Binds.class)
+            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+            .returns(TypeName.get(presenter.asType()))
+            .addParameter(presenterParam.build());
+
+    getQualifiers(presenter)
+        .forEach(
+            annotationMirror ->
+                bindPresenter.addAnnotation(
+                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement())));
+    bindingModule.addMethod(bindPresenter.build());
+
     sourceUtil
         .findImplementedInterface(presenter, UiHandlers.class)
         .ifPresent(
             typeMirror -> {
-              ParameterSpec.Builder presenterParam =
-                  ParameterSpec.builder(guessImpl(presenter, "Impl"), "impl");
               qualifiers.forEach(
                   annotationMirror ->
                       presenterParam.addAnnotation(
                           ClassName.get(
                               (TypeElement) annotationMirror.getAnnotationType().asElement())));
 
+              ParameterSpec.Builder param =
+                  ParameterSpec.builder(guessImpl(presenter, ""), "presenter");
+
               MethodSpec.Builder bindMethod =
                   MethodSpec.methodBuilder(
-                          sourceUtil.smallFirstLetter(presenter.getSimpleName().toString()))
+                          sourceUtil.smallFirstLetter(presenter.getSimpleName().toString())
+                              + "Handlers")
                       .addAnnotation(Singleton.class)
                       .addAnnotation(Binds.class)
                       .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                       .returns(TypeName.get(typeMirror))
-                      .addParameter(presenterParam.build());
+                      .addParameter(param.build());
               getQualifiers(presenter)
                   .forEach(
                       annotationMirror ->
@@ -756,9 +777,23 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
   }
 
   private ClassName guessImpl(Element element, String postfix) {
+    return guessImpl(element, "", postfix);
+  }
+
+  private ClassName guessName(Element element, String name) {
+    return ClassName.bestGuess(
+        elements().getPackageOf(element).getQualifiedName().toString() + "." + name);
+  }
+
+  private ClassName guessName(Class<?> clazz, String name) {
+    return ClassName.bestGuess(ClassName.get(clazz).packageName() + "." + name);
+  }
+
+  private ClassName guessImpl(Element element, String prefix, String postfix) {
     return ClassName.bestGuess(
         elements().getPackageOf(element).getQualifiedName().toString()
             + "."
+            + prefix
             + element.getSimpleName().toString()
             + postfix);
   }
@@ -788,172 +823,64 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
             });
   }
 
-  private void generateRoutingTask(Element presenter, TypeSpec.Builder bindingModule) {
+  private Optional<TypeSpec.Builder> generateRoutingClass(Element presenter) {
     boolean childPresenter = sourceUtil.isAssignableFrom(ChildPresenter.class, presenter.asType());
-    if (childPresenter) {
 
-      TypeMirror parentPresenter = sourceUtil.findTypeArgument(presenter, Presenter.class).get();
+    BrixRoute route = sourceUtil.findClassAnnotation(presenter, BrixRoute.class);
+    Optional<TypeMirror> router =
+        sourceUtil.getClassValueFromAnnotation(presenter, BrixRoute.class, "router");
 
-      TypeSpec.Builder routingTask =
-          TypeSpec.classBuilder(presenter.getSimpleName().toString() + "Routing")
-              .superclass(
-                  ParameterizedTypeName.get(
-                      ClassName.get(AbstractChildRoutingTask.class),
-                      TypeName.get(parentPresenter),
-                      TypeName.get(presenter.asType())));
-
-      ParameterSpec.Builder parentParam =
-          ParameterSpec.builder(guessImpl(types().asElement(parentPresenter), "Impl"), "parent");
-      Set<? extends AnnotationMirror> parentQualifiers =
-          getQualifiers(types().asElement(parentPresenter));
-      parentQualifiers.forEach(
-          annotationMirror -> {
-            parentParam.addAnnotation(
-                ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-          });
-
-      Set<? extends AnnotationMirror> qualifiers = getQualifiers(presenter);
-
-      ParameterSpec.Builder presenterParam =
-          ParameterSpec.builder(guessImpl(presenter, "Impl"), "presenter");
-      qualifiers.forEach(
-          annotationMirror -> {
-            presenterParam.addAnnotation(
-                ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-            routingTask.addAnnotation(
-                ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-          });
-
-      routingTask
-          .addAnnotation(Singleton.class)
-          .addModifiers(Modifier.PUBLIC)
-          .addMethod(
-              MethodSpec.constructorBuilder()
-                  .addAnnotation(Inject.class)
-                  .addModifiers(Modifier.PUBLIC)
-                  .addParameter(parentParam.build())
-                  .addParameter(presenterParam.build())
-                  .addStatement("super(parent, presenter)")
-                  .build());
-
-      TypeSpec routingType = routingTask.build();
-      writeFile(routingType, presenter);
-
-      ParameterSpec.Builder parameter =
-          ParameterSpec.builder(guessImpl(presenter, "Routing"), "routing");
-
-      MethodSpec.Builder routingMethod =
-          MethodSpec.methodBuilder(
-              sourceUtil.smallFirstLetter(presenter.getSimpleName().toString() + "Routing"));
-
-      getQualifiers(presenter)
-          .forEach(
-              annotationMirror -> {
-                parameter.addAnnotation(
-                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-                routingMethod.addAnnotation(
-                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-              });
-
-      bindingModule.addMethod(
-          routingMethod
-              .addAnnotation(Singleton.class)
-              .addAnnotation(Binds.class)
-              .addAnnotation(IntoSet.class)
-              .returns(RoutingTask.class)
-              .addParameter(parameter.build())
-              .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-              .build());
-
+    if (router.isPresent()
+        && !sourceUtil.isAssignableFrom(BrixRoute.UnspecifiedRouter.class, router.get())) {
+      return Optional.empty();
     } else {
-      TypeSpec.Builder routingTask =
-          TypeSpec.classBuilder(presenter.getSimpleName().toString() + "Routing")
-              .superclass(
-                  ParameterizedTypeName.get(
-                      ClassName.get(AbstractRoutingTask.class), TypeName.get(presenter.asType())));
+      if (childPresenter) {
 
-      ParameterSpec.Builder presenterParam =
-          ParameterSpec.builder(guessImpl(presenter, "Impl"), "presenter");
+        TypeSpec.Builder routingBuilder =
+            TypeSpec.classBuilder(presenter.getSimpleName().toString() + "Routing")
+                .superclass(ChildPresenterRouting.class)
+                .addModifiers(Modifier.PUBLIC);
 
-      Set<? extends AnnotationMirror> qualifiers = getQualifiers(presenter);
-      qualifiers.forEach(
-          annotationMirror -> {
-            presenterParam.addAnnotation(
-                ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-            routingTask.addAnnotation(
-                ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-          });
+        TypeMirror parentPresenter = sourceUtil.findTypeArgument(presenter, Presenter.class).get();
+        routingBuilder
+            .addModifiers(Modifier.PUBLIC)
+            .addMethod(
+                MethodSpec.constructorBuilder()
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement(
+                        "super(new $T())", getPresenterRouter(types().asElement(parentPresenter)))
+                    .build());
 
-      routingTask
-          .addAnnotation(Singleton.class)
-          .addModifiers(Modifier.PUBLIC)
-          .addMethod(
-              MethodSpec.constructorBuilder()
-                  .addAnnotation(Inject.class)
+        if (nonNull(route) && nonNull(route.value()) && !route.value().trim().isEmpty()) {
+          routingBuilder.addMethod(
+              MethodSpec.methodBuilder("getRoutingPath")
+                  .addAnnotation(Override.class)
                   .addModifiers(Modifier.PUBLIC)
-                  .addParameter(
-                      ParameterSpec.builder(TypeName.get(AppHistory.class), "history")
-                          .addAnnotation(Global.class)
-                          .build())
-                  .addParameter(presenterParam.build())
-                  .addStatement("super(history, presenter)")
+                  .returns(String.class)
+                  .addStatement("return $S", route.value())
                   .build());
+        }
 
-      TypeSpec routingType = routingTask.build();
-      writeFile(routingType, presenter);
+        return Optional.of(routingBuilder);
 
-      ParameterSpec.Builder parameter =
-          ParameterSpec.builder(guessImpl(presenter, "Routing"), "routing");
+      } else {
+        TypeSpec.Builder routingBuilder =
+            TypeSpec.classBuilder(presenter.getSimpleName().toString() + "Routing")
+                .addSuperinterface(RoutingProvider.class)
+                .addModifiers(Modifier.PUBLIC);
 
-      MethodSpec.Builder routingMethod =
-          MethodSpec.methodBuilder(
-              sourceUtil.smallFirstLetter(presenter.getSimpleName().toString() + "Routing"));
-      getQualifiers(presenter)
-          .forEach(
-              annotationMirror -> {
-                parameter.addAnnotation(
-                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-                routingMethod.addAnnotation(
-                    ClassName.get((TypeElement) annotationMirror.getAnnotationType().asElement()));
-              });
-
-      bindingModule.addMethod(
-          routingMethod
-              .addAnnotation(Singleton.class)
-              .addAnnotation(Binds.class)
-              .addAnnotation(IntoSet.class)
-              .returns(RoutingTask.class)
-              .addParameter(parameter.build())
-              .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-              .build());
+        if (nonNull(route) && nonNull(route.value()) && !route.value().trim().isEmpty()) {
+          routingBuilder.addMethod(
+              MethodSpec.methodBuilder("getRoutingPath")
+                  .addAnnotation(Override.class)
+                  .addModifiers(Modifier.PUBLIC)
+                  .returns(String.class)
+                  .addStatement("return $S", route.value())
+                  .build());
+        }
+        return Optional.of(routingBuilder);
+      }
     }
-  }
-
-  private TypeSpec generateStartupTasks(
-      String moduleName, ImmutableSetMultimap<String, Element> elementsByAnnotation) {
-
-    TypeSpec.Builder tasksModule =
-        TypeSpec.interfaceBuilder(
-                "Brix" + sourceUtil.capitalizeFirstLetter(moduleName) + "TasksModule_")
-            .addAnnotation(Module.class);
-    elementsByAnnotation
-        .get(Task.class.getCanonicalName())
-        .forEach(
-            taskElement -> {
-              tasksModule.addMethod(
-                  MethodSpec.methodBuilder(
-                          sourceUtil.smallFirstLetter(taskElement.getSimpleName().toString()))
-                      .addAnnotation(Singleton.class)
-                      .addAnnotation(IntoSet.class)
-                      .addAnnotation(Binds.class)
-                      .addAnnotation(BrixTask.class)
-                      .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                      .addParameter(
-                          ParameterSpec.builder(TypeName.get(taskElement.asType()), "task").build())
-                      .returns(StartupTask.class)
-                      .build());
-            });
-    return tasksModule.build();
   }
 
   private void writeFile(TypeSpec typeSpec, Element element) {

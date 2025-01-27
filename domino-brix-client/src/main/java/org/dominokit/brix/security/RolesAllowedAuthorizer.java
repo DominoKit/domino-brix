@@ -15,7 +15,6 @@
  */
 package org.dominokit.brix.security;
 
-import org.dominokit.brix.events.BrixUser;
 import org.dominokit.brix.events.HasRoles;
 
 public class RolesAllowedAuthorizer implements Authorizer {
@@ -23,7 +22,6 @@ public class RolesAllowedAuthorizer implements Authorizer {
 
   @Override
   public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
-    Boolean authenticated = context.getUser().map(BrixUser::isAuthenticated).orElse(false);
-    return authenticated && context.isAuthorizedForAny(hasRoles.getRoles());
+    return context.getUser().isAuthenticated() && context.isAuthorizedForAny(hasRoles.getRoles());
   }
 }

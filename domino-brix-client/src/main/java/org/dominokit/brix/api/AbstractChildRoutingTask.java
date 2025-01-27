@@ -33,7 +33,7 @@ public abstract class AbstractChildRoutingTask<
           presenter.setRoutingState(state);
           presenter.activate();
         };
-    this.history.listen(presenter.getTokenFilter(), listener);
+    //    this.history.listen(presenter.getTokenFilter(), listener);
   }
 
   protected void bind(P parent, C child) {

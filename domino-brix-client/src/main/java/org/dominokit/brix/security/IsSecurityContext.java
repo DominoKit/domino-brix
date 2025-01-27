@@ -16,11 +16,12 @@
 package org.dominokit.brix.security;
 
 import java.util.Collection;
-import java.util.Optional;
 import org.dominokit.brix.events.BrixUser;
 
 public interface IsSecurityContext {
-  <U extends BrixUser> Optional<U> getUser();
+  BrixUser getUser();
+
+  boolean isAuthenticated();
 
   boolean isAuthorizedFor(String role);
 

@@ -49,9 +49,9 @@ public class TestChildPresenterImpl extends TestChildPresenter {
         break;
     }
   }
-
-  @Override
-  public String getRoutingPath() {
-    return "/child";
-  }
+  //
+  //  @Override
+  //  public String getRoutingPath() {
+  //    return "/child";
+  //  }
 }

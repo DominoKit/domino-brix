@@ -15,32 +15,18 @@
  */
 package org.dominokit.brix;
 
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.dominokit.brix.annotations.BrixTask;
-import org.dominokit.brix.api.RoutingTask;
-import org.dominokit.brix.api.StartupTask;
 
 @Singleton
-public class BrixModule extends BrixModuleAdapter {
+public class BrixModule {
 
-  private final Set<StartupTask> startupTasks;
-  private final Set<RoutingTask> routingTasks;
+  //  private final Set<StartupTask> startupTasks;
+  //  private final Set<RoutingTask> routingTasks;
 
   @Inject
-  public BrixModule(@BrixTask Set<StartupTask> startupTasks, Set<RoutingTask> routingTasks) {
-    this.startupTasks = startupTasks;
-    this.routingTasks = routingTasks;
-  }
-
-  @Override
-  public Set<StartupTask> startupTasks() {
-    return startupTasks;
-  }
-
-  @Override
-  public Set<RoutingTask> routingTasks() {
-    return routingTasks;
+  public BrixModule() {
+    //    this.startupTasks = startupTasks;
+    //    this.routingTasks = routingTasks;
   }
 }

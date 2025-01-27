@@ -16,13 +16,16 @@
 package org.dominokit.brix.security;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.dominokit.brix.events.BrixUser;
+import org.dominokit.brix.events.UserAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class SecurityContext implements IsSecurityContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SecurityContext.class);
-
+  private static final BrixUser NULL_USER = new NullUser();
   private BrixUser user;
   private Runnable unauthorizedAccessHandler =
       () -> {
@@ -40,8 +43,13 @@ public class SecurityContext implements IsSecurityContext {
   @Inject
   public SecurityContext() {}
 
-  public <U extends BrixUser> Optional<U> getUser() {
-    return Optional.ofNullable((U) user);
+  public BrixUser getUser() {
+    return nonNull(user) ? user : NULL_USER;
+  }
+
+  @Override
+  public boolean isAuthenticated() {
+    return getUser().isAuthenticated();
   }
 
   public SecurityContext setUser(BrixUser user) {
@@ -58,10 +66,7 @@ public class SecurityContext implements IsSecurityContext {
   }
 
   public boolean isAuthorizedFor(String role) {
-    if (isNull(user)) {
-      return false;
-    }
-    return user.getRoles().contains(role);
+    return getUser().getRoles().contains(role);
   }
 
   public boolean isAuthorizedForAll(String... roles) {
@@ -69,10 +74,10 @@ public class SecurityContext implements IsSecurityContext {
   }
 
   public boolean isAuthorizedForAll(Collection<String> roles) {
-    if (isNull(user) || isNull(roles)) {
+    if (isNull(roles)) {
       return false;
     }
-    return user.getRoles().containsAll(roles);
+    return getUser().getRoles().containsAll(roles);
   }
 
   public boolean isAuthorizedForAny(String... roles) {
@@ -80,9 +85,56 @@ public class SecurityContext implements IsSecurityContext {
   }
 
   public boolean isAuthorizedForAny(Collection<String> roles) {
-    if (isNull(user) || isNull(roles)) {
+    if (isNull(roles)) {
       return false;
     }
-    return roles.stream().anyMatch(role -> user.getRoles().contains(role));
+    return roles.stream().anyMatch(role -> getUser().getRoles().contains(role));
+  }
+
+  private static class NullUser implements BrixUser {
+    @Override
+    public boolean isAuthenticated() {
+      return false;
+    }
+
+    @Override
+    public Set<String> getRoles() {
+      return Set.of();
+    }
+
+    @Override
+    public String getId() {
+      return "";
+    }
+
+    @Override
+    public String getReference() {
+      return "";
+    }
+
+    @Override
+    public String getUserName() {
+      return "";
+    }
+
+    @Override
+    public String getFirstName() {
+      return "";
+    }
+
+    @Override
+    public String getLastName() {
+      return "";
+    }
+
+    @Override
+    public String getEmail() {
+      return "";
+    }
+
+    @Override
+    public Map<String, UserAttribute<?>> getAttributes() {
+      return Map.of();
+    }
   }
 }

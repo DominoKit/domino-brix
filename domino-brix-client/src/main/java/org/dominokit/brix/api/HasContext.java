@@ -15,36 +15,42 @@
  */
 package org.dominokit.brix.api;
 
+import static java.util.Objects.nonNull;
+
 import java.util.Set;
 
 public interface HasContext<T> {
 
-  default void update(T context) {
-    update(context, Operation.UPDATED);
-  }
-
-  default void update(T context, Operation operation) {
+  default void update(IsContext<T> context) {
+    setContext(context);
     getContextListeners()
         .forEach(
             contextListener -> {
-              contextListener.onContextChange(context, operation);
+              contextListener.onContextChange(context);
             });
   }
 
-  Set<ContextListener<? super T>> getContextListeners();
+  void setContext(IsContext<T> context);
 
-  default T registerContextListener(ContextListener<? super T> contextListener) {
+  IsContext<T> getContext();
+
+  Set<ContextListener<T>> getContextListeners();
+
+  default T registerContextListener(ContextListener<T> contextListener) {
     getContextListeners().add(contextListener);
+    if (nonNull(getContext()) && nonNull(getContext().getData())) {
+      contextListener.onContextChange(getContext());
+    }
     return (T) this;
   }
 
-  default T removeChangeListener(ContextListener<? super T> contextListener) {
+  default T removeContextListener(ContextListener<? super T> contextListener) {
     getContextListeners().remove(contextListener);
     return (T) this;
   }
 
   interface ContextListener<T> {
-    void onContextChange(T context, Operation operation);
+    void onContextChange(IsContext<T> context);
   }
 
   interface Operation {
@@ -63,6 +69,47 @@ public interface HasContext<T> {
         runnable.run();
       }
       return this;
+    }
+  }
+
+  interface IsContext<T> {
+    T getData();
+
+    default Operation getOperation() {
+      return Operation.UPDATED;
+    }
+
+    Object getSource();
+
+    static <T> IsContext<T> of(Object source, T data, Operation operation) {
+      return new IsContext<T>() {
+        @Override
+        public T getData() {
+          return data;
+        }
+
+        @Override
+        public Object getSource() {
+          return source;
+        }
+
+        @Override
+        public Operation getOperation() {
+          return operation;
+        }
+      };
+    }
+
+    static <T> IsContext<T> updated(Object source, T data) {
+      return of(source, data, Operation.UPDATED);
+    }
+
+    static <T> IsContext<T> deleted(Object source, T data) {
+      return of(source, data, Operation.DELETED);
+    }
+
+    static <T> IsContext<T> created(Object source, T data) {
+      return of(source, data, Operation.CREATED);
     }
   }
 }

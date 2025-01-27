@@ -15,7 +15,6 @@
  */
 package org.dominokit.brix.security;
 
-import org.dominokit.brix.events.BrixUser;
 import org.dominokit.brix.events.HasRoles;
 
 public class PermitAllAuthorizer implements Authorizer {
@@ -23,6 +22,6 @@ public class PermitAllAuthorizer implements Authorizer {
 
   @Override
   public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
-    return context.getUser().map(BrixUser::isAuthenticated).orElse(false);
+    return context.getUser().isAuthenticated();
   }
 }

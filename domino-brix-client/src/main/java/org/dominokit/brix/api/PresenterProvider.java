@@ -15,27 +15,17 @@
  */
 package org.dominokit.brix.api;
 
-import org.dominokit.domino.api.shared.extension.ContextAggregator;
+import dagger.Lazy;
 
-public abstract class StartupTask {
+public abstract class PresenterProvider<P extends Presenter<?>> {
 
-  private final ContextAggregator.ContextWait<StartupTask> contextWait;
+  private Lazy<P> presenter;
 
-  protected StartupTask() {
-    this.contextWait = new ContextAggregator.ContextWait<>();
+  public PresenterProvider(Lazy<P> presenter) {
+    this.presenter = presenter;
   }
 
-  public ContextAggregator.ContextWait<StartupTask> getContextWait() {
-    return contextWait;
-  }
-
-  public final void complete() {
-    contextWait.complete(this);
-  }
-
-  public abstract void run();
-
-  public int order() {
-    return 0;
+  public P get() {
+    return presenter.get();
   }
 }

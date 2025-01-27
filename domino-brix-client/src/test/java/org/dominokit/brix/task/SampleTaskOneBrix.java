@@ -13,34 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix;
+package org.dominokit.brix.task;
 
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.dominokit.brix.annotations.BrixTask;
-import org.dominokit.brix.api.RoutingTask;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.brix.api.BrixStartupTask;
 
-@Singleton
-public class BrixModule extends BrixModuleAdapter {
-
-  private final Set<StartupTask> startupTasks;
-  private final Set<RoutingTask> routingTasks;
-
-  @Inject
-  public BrixModule(@BrixTask Set<StartupTask> startupTasks, Set<RoutingTask> routingTasks) {
-    this.startupTasks = startupTasks;
-    this.routingTasks = routingTasks;
+@BrixTask
+public class SampleTaskOneBrix extends BrixStartupTask {
+  @Override
+  public void run() {
+    System.out.println("Task one executed.");
+    complete();
   }
 
   @Override
-  public Set<StartupTask> startupTasks() {
-    return startupTasks;
-  }
-
-  @Override
-  public Set<RoutingTask> routingTasks() {
-    return routingTasks;
+  public int order() {
+    return 10;
   }
 }

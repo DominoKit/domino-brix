@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix;
+package org.dominokit.brix.task;
 
-import java.util.Set;
-import org.dominokit.brix.api.RoutingTask;
-import org.dominokit.brix.api.StartupTask;
+import org.dominokit.brix.annotations.BrixTask;
+import org.dominokit.brix.api.BrixStartupTask;
 
-public abstract class BrixModuleAdapter {
-  public abstract Set<StartupTask> startupTasks();
+@BrixTask
+public class SampleTaskThreeBrix extends BrixStartupTask {
+  @Override
+  public void run() {
+    System.out.println("Task three executed.");
+    complete();
+  }
 
-  public abstract Set<RoutingTask> routingTasks();
-
-  public void init(CoreComponent coreComponent) {
-    startupTasks().forEach(task -> coreComponent.core().register(task));
-    routingTasks().forEach(task -> coreComponent.core().register(task));
+  @Override
+  public int order() {
+    return 10;
   }
 }

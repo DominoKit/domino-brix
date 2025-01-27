@@ -15,6 +15,20 @@
  */
 package org.dominokit.brix;
 
-public interface ModuleComponent {
-  BrixModule module();
+import dagger.Module;
+import javax.inject.Inject;
+
+@Module
+public class CoreComponentModule implements PresentationModule {
+  private CoreComponent coreComponent;
+
+  @Inject
+  public CoreComponentModule(CoreComponent coreComponent) {
+    this.coreComponent = coreComponent;
+  }
+
+  @Override
+  public CoreComponent coreComponent() {
+    return this.coreComponent;
+  }
 }

@@ -19,6 +19,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.dominokit.brix.api.RoutingProvider;
 
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})
@@ -26,4 +27,8 @@ public @interface BrixRoute {
 
   /** @return the String module name */
   String value() default "";
+
+  Class<? extends RoutingProvider> router() default UnspecifiedRouter.class;
+
+  public final class UnspecifiedRouter implements RoutingProvider {}
 }

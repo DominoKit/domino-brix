@@ -275,6 +275,7 @@
                 <artifactId>gitflow-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
+                    <skipTestProject>true</skipTestProject>
                     <snapshotVersionProperty>snapshot.version</snapshotVersionProperty>
                     <releaseVersionProperty>next.release.version</releaseVersionProperty>
                     <!-- Set to true to immediately bump the development version when creating a release branch -->

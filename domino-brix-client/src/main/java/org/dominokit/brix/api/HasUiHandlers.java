@@ -15,6 +15,10 @@
  */
 package org.dominokit.brix.api;
 
+/** Implemented by presenters or views that expose UI handlers to views. */
 public interface HasUiHandlers<U extends UiHandlers> {
+  /**
+   * @return associated UI handlers
+   */
   U getUiHandlers();
 }

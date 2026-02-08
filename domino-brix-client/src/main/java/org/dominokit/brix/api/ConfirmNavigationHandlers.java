@@ -15,8 +15,11 @@
  */
 package org.dominokit.brix.api;
 
+/** Callbacks used by {@link CanConfirmNavigation} implementers when prompting the user. */
 public interface ConfirmNavigationHandlers {
+  /** Invoked when the user confirms navigation away. */
   void onConfirmed();
 
+  /** Invoked when the user cancels navigation. */
   void onCanceled();
 }

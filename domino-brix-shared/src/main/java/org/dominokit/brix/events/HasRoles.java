@@ -17,6 +17,14 @@ package org.dominokit.brix.events;
 
 import java.util.Set;
 
+/**
+ * Marker for domain objects that expose role membership.
+ *
+ * <p>Used by security checks when deciding access to presenters or actions.
+ */
 public interface HasRoles {
+  /**
+   * @return set of role names granted to the object
+   */
   Set<String> getRoles();
 }

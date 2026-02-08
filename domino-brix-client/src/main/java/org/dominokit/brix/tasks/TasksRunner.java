@@ -27,16 +27,22 @@ import org.dominokit.domino.api.shared.extension.ContextAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Executes {@link BrixStartupTask} instances in order, grouping tasks with the same order value.
+ */
 public class TasksRunner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TasksRunner.class);
 
+  /**
+   * Runs the provided tasks and invokes the completion handler after all groups finish.
+   *
+   * @param tasks set of tasks to execute
+   * @param completeHandler callback executed when all tasks are done
+   */
   public void runTasks(Set<BrixStartupTask> tasks, Runnable completeHandler) {
     TreeSet<TasksAggregator> sorted =
-        tasks.stream()
-            .collect(groupingBy(BrixStartupTask::order))
-            .entrySet()
-            .stream()
+        tasks.stream().collect(groupingBy(BrixStartupTask::order)).entrySet().stream()
             .map(taskEntry -> new TasksAggregator(taskEntry.getKey(), taskEntry.getValue()))
             .collect(Collectors.toCollection(TreeSet::new));
 

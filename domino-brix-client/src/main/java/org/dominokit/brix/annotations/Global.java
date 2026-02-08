@@ -21,6 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
+/** Qualifier for bindings that should be shared globally across components. */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})

@@ -16,10 +16,17 @@
 
 package org.dominokit.brix.api;
 
+/**
+ * Presenter that defers activation until its parent presenter is active. Useful for hierarchical
+ * routing where child views depend on parent layout.
+ */
 public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V extends Viewable>
     extends Presenter<V> {
   private P parent;
 
+  /**
+   * @return the parent presenter
+   */
   public P getParent() {
     return parent;
   }
@@ -33,9 +40,14 @@ public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V 
     }
   }
 
+  /** Sets the parent presenter instance. */
   public void setParent(P parent) {
     this.parent = parent;
   }
 
+  /**
+   * Hook invoked when binding to a parent. Override to coordinate child/parent state before
+   * activation.
+   */
   public void onBindParent(P parent) {}
 }

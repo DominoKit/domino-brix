@@ -17,10 +17,12 @@ package org.dominokit.brix.security;
 
 import org.dominokit.brix.events.HasRoles;
 
+/** Authorizer that always denies access regardless of user roles. */
 public class DenyAllAuthorizer implements Authorizer {
   public static final Authorizer INSTANCE = new DenyAllAuthorizer();
 
   @Override
+  /** Always returns {@code false}. */
   public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
     return false;
   }

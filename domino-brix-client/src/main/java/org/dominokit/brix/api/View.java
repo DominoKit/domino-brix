@@ -15,4 +15,5 @@
  */
 package org.dominokit.brix.api;
 
+/** Marker interface for views that are attachable and can be revealed inside slots. */
 public interface View extends IsAttachable, Viewable {}

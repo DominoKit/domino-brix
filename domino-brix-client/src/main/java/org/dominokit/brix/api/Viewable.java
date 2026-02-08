@@ -15,10 +15,21 @@
  */
 package org.dominokit.brix.api;
 
+/**
+ * Represents a UI element that can be attached to and detached from a {@link Slot}. Implementations
+ * are typically concrete view classes.
+ */
 public interface Viewable {
+  /**
+   * @return {@code true} when the view is currently attached to the DOM
+   */
   boolean isAttached();
 
+  /**
+   * @return unique identifier for the view instance
+   */
   String getId();
 
+  /** Detaches the view from its slot if attached. */
   void detach();
 }

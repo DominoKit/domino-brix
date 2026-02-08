@@ -28,6 +28,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface QueryParameter {
 
-  /** @return String query parameter name */
+  /**
+   * @return String query parameter name
+   */
   String value() default "";
 }

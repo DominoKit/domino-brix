@@ -19,7 +19,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/** A base class for lazy initialization of objects. */
+/**
+ * Base class for lazy initialization of objects. Encapsulates logic for one-time execution,
+ * deferred callbacks, and reset hooks.
+ */
 public abstract class LazyInitializer {
 
   private Runnable function;
@@ -31,9 +34,7 @@ public abstract class LazyInitializer {
   private Set<Runnable> doOnReset = new HashSet<>();
 
   /**
-   * Constructs a BaseLazyInitializer with the given LambdaFunction.
-   *
-   * @param function The LambdaFunction to initialize the object.
+   * @param function runnable that performs the initialization work
    */
   public LazyInitializer(Runnable function) {
     this.function = function;
@@ -51,11 +52,7 @@ public abstract class LazyInitializer {
         };
   }
 
-  /**
-   * Applies the lazy initialization logic.
-   *
-   * @return This BaseLazyInitializer instance.
-   */
+  /** Applies the lazy initialization logic. */
   public LazyInitializer apply() {
     if (!initialized) {
       function.run();
@@ -69,12 +66,7 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /**
-   * Executes the given LambdaFunction if the object has already been initialized.
-   *
-   * @param lambdaFunction The LambdaFunction to execute if initialized.
-   * @return This BaseLazyInitializer instance.
-   */
+  /** Executes the given function if already initialized. */
   public LazyInitializer ifInitialized(Runnable lambdaFunction) {
     if (isInitialized()) {
       lambdaFunction.run();
@@ -82,13 +74,7 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /**
-   * Executes the provided LambdaFunctions when the object has been initialized. If the object has
-   * not been initialized yet, stores the functions for future execution.
-   *
-   * @param functions The LambdaFunctions to execute when initialized.
-   * @return This BaseLazyInitializer instance.
-   */
+  /** Executes or defers functions to run once initialization completes. */
   public LazyInitializer whenInitialized(Runnable... functions) {
     if (isInitialized()) {
       for (Runnable func : functions) {
@@ -100,13 +86,7 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /**
-   * Executes the given LambdaFunction once when the object is initialized. If the object has
-   * already been initialized, the function is executed immediately.
-   *
-   * @param function The LambdaFunction to execute once.
-   * @return This BaseLazyInitializer instance.
-   */
+  /** Executes the given function once on initialization, or immediately if already initialized. */
   public LazyInitializer doOnce(Runnable function) {
     if (isInitialized()) {
       function.run();
@@ -116,30 +96,20 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /**
-   * Adds a LambdaFunction to be executed when the object is reset.
-   *
-   * @param function The LambdaFunction to execute on reset.
-   * @return This BaseLazyInitializer instance.
-   */
+  /** Adds a function to run when the initializer is reset. */
   public LazyInitializer onReset(Runnable function) {
     doOnReset.add(function);
     return this;
   }
 
   /**
-   * Checks if the object has been initialized.
-   *
-   * @return True if the object has been initialized, false otherwise.
+   * @return true when initialization has already run
    */
   public boolean isInitialized() {
     return initialized;
   }
 
-  /**
-   * Resets the object to its initial state, allowing it to be initialized again. Executes
-   * registered onReset LambdaFunctions.
-   */
+  /** Resets state allowing re-application and triggers registered reset callbacks. */
   public void reset() {
     if (isInitialized()) {
       this.function = this.originalFunction;

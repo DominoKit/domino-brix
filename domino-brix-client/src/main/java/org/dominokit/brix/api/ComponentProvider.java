@@ -17,10 +17,19 @@ package org.dominokit.brix.api;
 
 import static java.util.Objects.isNull;
 
+/**
+ * Lazy provider for generated components and presenters. Caches the created instance until reset
+ * after presenter deactivation.
+ *
+ * @param <T> provided type
+ */
 public abstract class ComponentProvider<T> {
 
   private T obj;
 
+  /**
+   * @return cached instance, creating a new one on first call
+   */
   public T get() {
     if (isNull(obj)) {
       this.obj = newInstance();
@@ -32,5 +41,8 @@ public abstract class ComponentProvider<T> {
     this.obj = null;
   }
 
+  /**
+   * @return newly created instance
+   */
   protected abstract T newInstance();
 }

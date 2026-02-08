@@ -19,40 +19,69 @@ import static java.util.Objects.nonNull;
 
 import java.util.function.Consumer;
 
+/**
+ * Wrapper for arbitrary typed user attributes. Provides helper utilities to inspect the underlying
+ * type without manual casts.
+ *
+ * @param <T> attribute value type
+ */
 public interface UserAttribute<T> {
 
+  /**
+   * @return runtime type for the stored value, or {@code null} if none is set
+   */
   default Class<T> getType() {
     return nonNull(getValue()) ? (Class<T>) getValue().getClass() : null;
   }
 
+  /**
+   * Checks if the attribute matches the provided type.
+   *
+   * @param type the expected class
+   * @return {@code true} when the value is not null and is exactly of the given type
+   */
   default boolean isOfType(Class<T> type) {
     return nonNull(getType()) && getType().equals(type);
   }
 
+  /**
+   * Invokes the consumer if the stored value is of the requested type.
+   *
+   * @param type target type
+   * @param consumer handler to execute when the type matches
+   */
   default void ifTypeIs(Class<T> type, Consumer<T> consumer) {
     if (isOfType(type)) {
       consumer.accept(getValue());
     }
   }
 
+  /**
+   * @return the raw attribute value
+   */
   T getValue();
 
+  /** Convenience factory for string attributes. */
   static UserAttribute<String> of(String value) {
     return () -> value;
   }
 
+  /** Convenience factory for integer attributes. */
   static UserAttribute<Integer> of(Integer value) {
     return () -> value;
   }
 
+  /** Convenience factory for double attributes. */
   static UserAttribute<Double> of(Double value) {
     return () -> value;
   }
 
+  /** Convenience factory for long attributes. */
   static UserAttribute<Long> of(Long value) {
     return () -> value;
   }
 
+  /** Convenience factory for boolean attributes. */
   static UserAttribute<Boolean> of(Boolean value) {
     return () -> value;
   }

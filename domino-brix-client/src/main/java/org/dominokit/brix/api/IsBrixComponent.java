@@ -15,4 +15,5 @@
  */
 package org.dominokit.brix.api;
 
+/** Marker for classes that represent a Domino Brix component. */
 public interface IsBrixComponent {}

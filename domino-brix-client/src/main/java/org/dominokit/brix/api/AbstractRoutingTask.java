@@ -18,6 +18,12 @@ package org.dominokit.brix.api;
 import org.dominokit.domino.history.AppHistory;
 import org.dominokit.domino.history.DominoHistory;
 
+/**
+ * Base routing task that listens to history changes and activates a presenter when its filter
+ * matches.
+ *
+ * @param <P> presenter type
+ */
 public abstract class AbstractRoutingTask<P extends Presenter<?>> implements RoutingTask {
 
   protected final AppHistory history;

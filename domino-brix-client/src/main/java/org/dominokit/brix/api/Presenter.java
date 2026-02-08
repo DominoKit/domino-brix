@@ -40,6 +40,12 @@ import org.dominokit.domino.history.HistoryInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Base presenter that manages lifecycle, slot registration, event listening, routing state, and
+ * security checks for a view.
+ *
+ * @param <V> associated view type
+ */
 public abstract class Presenter<V extends Viewable>
     implements EventListener, UiHandlers, BrixSlots.SlotListener, HasRoles, HasAuthorizer {
 
@@ -79,15 +85,21 @@ public abstract class Presenter<V extends Viewable>
     return this.view;
   }
 
+  /** Invoked by the DI container after construction to trigger {@link #postConstruct()}. */
   @Inject
   public final void onPostConstruct() {
     postConstruct();
   }
 
+  /**
+   * Lazily provides the view instance. Subclasses override to supply the concrete view, optionally
+   * delaying creation until first access.
+   */
   protected V view() {
     return null;
   }
 
+  /** Lifecycle hook called once after injection is complete. */
   protected void postConstruct() {
     LOGGER.info("Presenter [" + this + "] : PostConstruct.");
   }
@@ -100,6 +112,7 @@ public abstract class Presenter<V extends Viewable>
     onReady();
   }
 
+  /** Override to register slots needed by the presenter before reveal. */
   protected void registerSlots() {}
 
   private void onReady() {
@@ -128,13 +141,16 @@ public abstract class Presenter<V extends Viewable>
     this.reveled = false;
   }
 
+  /** Determines whether the presenter should auto-reveal when its slot becomes available. */
   protected boolean isAutoReveal() {
     return true;
   }
 
   @Override
+  /** Receives events fired on the {@link BrixEvents} bus. Override to handle custom events. */
   public void onEventReceived(BrixEvent event) {}
 
+  /** Controls whether the presenter can become active. */
   protected boolean isEnabled() {
     return true;
   }
@@ -157,6 +173,7 @@ public abstract class Presenter<V extends Viewable>
     }
   }
 
+  /** Public entry point to activate the presenter. */
   public final void activate() {
     doActivate();
   }
@@ -226,6 +243,7 @@ public abstract class Presenter<V extends Viewable>
   }
 
   @Override
+  /** Called when a new slot is registered. Reveals the view if the slot matches this presenter. */
   public void onSlotRegistered(String key) {
     if (key.equals(getSlotKey())) {
       tryReveal();
@@ -237,8 +255,10 @@ public abstract class Presenter<V extends Viewable>
   }
 
   @Override
+  /** Notifies when a slot is removed. Override to react to slot lifecycle. */
   public void onSlotRemoved(String key) {}
 
+  /** Reveals the view inside its configured slot. */
   public final void reveal() {
     Optional<Slot> slot = getSlot();
     if (slot.isPresent()) {
@@ -261,10 +281,17 @@ public abstract class Presenter<V extends Viewable>
     return slots.findSlot(getSlotKey());
   }
 
+  /**
+   * @return the slot key this presenter reveals into
+   */
   protected String getSlotKey() {
     return null;
   }
 
+  /**
+   * Deactivates the presenter, detaching the view if attached and cleaning up registrations.
+   * Invokes {@link #onDeactivated()} after resources are released.
+   */
   public final void deactivate() {
     if (getView().isAttached()) {
       getSlot().ifPresent(slot -> slot.remove(getView()));
@@ -282,38 +309,58 @@ public abstract class Presenter<V extends Viewable>
     }
   }
 
+  /** Hook invoked before a routing task starts. */
   protected void onBeforeStartRouting() {}
 
+  /** Hook invoked when the routing state changes while active. */
   protected void onStateChanged() {}
 
+  /** Hook invoked after activation completes. */
   protected void onActivated() {}
 
+  /** Hook invoked after deactivation completes. */
   protected void onDeactivated() {}
 
+  /** Hook invoked right before a view is revealed. */
   protected void onBeforeRevealed() {}
 
+  /** Hook invoked immediately after a view is revealed. */
   protected void onRevealed() {}
 
+  /** Hook invoked after the view is detached from its slot. */
   protected void onRemoved() {}
 
+  /**
+   * @return router instance used for navigation
+   */
   public AppHistory getRouter() {
     return globalRouter;
   }
 
+  /**
+   * @return whether the presenter is currently active
+   */
   public final boolean isActive() {
     return active;
   }
 
   @Override
+  /** Default implementation returns empty roles. Override to provide required roles. */
   public Set<String> getRoles() {
     return new HashSet<>();
   }
 
   @Override
+  /** Default authorizer uses {@link DefaultAuthorizer} which always permits access. */
   public Authorizer getAuthorizer() {
     return DefaultAuthorizer.INSTANCE;
   }
 
+  /**
+   * Sets the current routing state before activation or state change callbacks.
+   *
+   * @param state routing state from the router
+   */
   public final void setRoutingState(DominoHistory.State state) {
     this.state = state;
     setState();
@@ -322,10 +369,14 @@ public abstract class Presenter<V extends Viewable>
     }
   }
 
+  /**
+   * @return {@code true} when the presenter has been revealed at least once
+   */
   public boolean isReveled() {
     return reveled;
   }
 
+  /** Override to map routing state into presenter fields. */
   public void setState() {}
 
   void registerChildListener(ChildListener listener) {

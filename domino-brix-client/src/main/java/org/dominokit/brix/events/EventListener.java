@@ -15,6 +15,12 @@
  */
 package org.dominokit.brix.events;
 
+/** Receives events published on {@link BrixEvents}. */
 public interface EventListener {
+  /**
+   * Called for every event fired on the bus.
+   *
+   * @param event dispatched event
+   */
   void onEventReceived(BrixEvent event);
 }

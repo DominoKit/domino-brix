@@ -26,6 +26,8 @@ import org.dominokit.brix.events.BrixEvent;
 @Target(ElementType.METHOD)
 public @interface ListenFor {
 
-  /** @return the type of {@link BrixEvent} that method is listening for */
+  /**
+   * @return the type of {@link BrixEvent} that method is listening for
+   */
   Class<? extends BrixEvent> value();
 }

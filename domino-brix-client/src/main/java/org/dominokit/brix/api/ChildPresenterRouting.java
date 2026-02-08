@@ -19,6 +19,10 @@ import static java.util.Objects.isNull;
 
 import org.dominokit.domino.history.TokenFilter;
 
+/**
+ * Routing provider that composes child presenter routes with their parent route. Determines the
+ * correct token filter based on whether parent or child paths are hash-based.
+ */
 public class ChildPresenterRouting implements RoutingProvider {
 
   private RoutingProvider parent;

@@ -15,7 +15,11 @@
  */
 package org.dominokit.brix.api;
 
+/** Exposes a {@link CanConfirmNavigation} instance for navigation interception. */
 public interface ProvidesConfirmNavigation {
 
+  /**
+   * @return confirm-navigation provider
+   */
   CanConfirmNavigation getConfirmNavigation();
 }

@@ -19,26 +19,53 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Singleton;
 
+/** Lightweight event bus for in-memory event dispatch between presenters. */
 @Singleton
 public class BrixEvents {
 
   private final Set<EventListener> listeners = new HashSet<>();
 
+  /**
+   * Registers a listener to receive all fired events.
+   *
+   * @param listener target listener
+   * @return registration record for removing the listener
+   */
   public RegistrationRecord register(EventListener listener) {
     listeners.add(listener);
     return () -> unregister(listener);
   }
 
+  /** Removes the listener from the bus. */
   public void unregister(EventListener listener) {
     listeners.remove(listener);
   }
 
+  /**
+   * Fires an event without a source.
+   *
+   * @param event event to dispatch
+   */
   public void fireEvent(BrixEvent event) {
     fireEvent(null, event);
   }
 
+  /**
+   * Fires an event, validating the source for listeners.
+   *
+   * <p>Event sources are immutable; when present they must match the provided source. If the event
+   * has no source, the {@code source} argument is ignored.
+   *
+   * @param source object that raised the event
+   * @param event event payload
+   */
   public void fireEvent(Object source, BrixEvent event) {
-    event.setSource(source);
+    if (event.getSource().isPresent()) {
+      Object existing = event.getSource().orElse(null);
+      if (source != null && existing != source) {
+        throw new IllegalStateException("Event source is immutable and already set.");
+      }
+    }
     listeners.forEach(listener -> listener.onEventReceived(event));
   }
 }

@@ -17,11 +17,13 @@ package org.dominokit.brix.security;
 
 import org.dominokit.brix.events.HasRoles;
 
+/** Authorizer that always permits access. Used as the framework default. */
 public class DefaultAuthorizer implements Authorizer {
 
   public static final Authorizer INSTANCE = new DefaultAuthorizer();
 
   @Override
+  /** Always returns {@code true}. */
   public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
     return true;
   }

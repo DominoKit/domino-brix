@@ -21,11 +21,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.dominokit.brix.api.RoutingProvider;
 
+/**
+ * Associates a presenter with a routing path. The processor generates a routing provider that
+ * registers the presenter with the router.
+ */
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})
 public @interface BrixRoute {
 
-  /** @return the String module name */
+  /**
+   * @return the String module name
+   */
   String value() default "";
 
   Class<? extends RoutingProvider> router() default UnspecifiedRouter.class;

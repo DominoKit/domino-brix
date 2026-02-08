@@ -20,8 +20,19 @@ import org.dominokit.brix.Brix;
 import org.dominokit.brix.HasPresenterProvider;
 import org.dominokit.domino.history.TokenFilter;
 
+/**
+ * Utility responsible for binding presenter instances to router token filters. Generated routing
+ * classes delegate here to wire presenters to history changes.
+ */
 public class RouterManager {
 
+  /**
+   * Registers a route for a standalone presenter.
+   *
+   * @param routing provider exposing the route filter
+   * @param componentProvider provider that supplies the presenter component
+   * @param <P> presenter type
+   */
   public static <P extends Presenter<?>> void initRoute(
       RoutingProvider routing,
       ComponentProvider<? extends HasPresenterProvider<? extends PresenterProvider<P>>>
@@ -55,6 +66,15 @@ public class RouterManager {
             });
   }
 
+  /**
+   * Registers a route for a child presenter that requires a parent presenter to be active.
+   *
+   * @param routing provider exposing the route filter
+   * @param componentProvider provider that supplies the child presenter component
+   * @param parentProvider provider that supplies the parent presenter component
+   * @param <P> parent presenter type
+   * @param <C> child presenter type
+   */
   public static <P extends Presenter<?>, C extends ChildPresenter<P, ?>> void initRoute(
       RoutingProvider routing,
       ComponentProvider<? extends HasPresenterProvider<? extends PresenterProvider<C>>>

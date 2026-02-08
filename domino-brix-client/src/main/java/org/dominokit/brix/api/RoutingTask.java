@@ -15,4 +15,5 @@
  */
 package org.dominokit.brix.api;
 
+/** Marker for routing tasks executed when wiring presenters to the router. */
 public interface RoutingTask {}

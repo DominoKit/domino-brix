@@ -27,6 +27,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface DefineSlots {
-  /** @return an Array of String names of the slots */
+  /**
+   * @return an Array of String names of the slots
+   */
   String[] value() default {};
 }

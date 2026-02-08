@@ -17,19 +17,43 @@ package org.dominokit.brix.events;
 
 import java.util.Map;
 
+/** Basic immutable profile details for a user. */
 public interface UserProfile {
 
+  /**
+   * @return stable unique identifier for the user
+   */
   String getId();
 
+  /**
+   * @return external reference or source-specific id
+   */
   String getReference();
 
+  /**
+   * @return username used to log in or display
+   */
   String getUserName();
 
+  /**
+   * @return user given name
+   */
   String getFirstName();
 
+  /**
+   * @return user family name
+   */
   String getLastName();
 
+  /**
+   * @return preferred email address
+   */
   String getEmail();
 
+  /**
+   * Arbitrary attributes associated with the user.
+   *
+   * @return map of attribute name to attribute wrapper
+   */
   Map<String, UserAttribute<?>> getAttributes();
 }

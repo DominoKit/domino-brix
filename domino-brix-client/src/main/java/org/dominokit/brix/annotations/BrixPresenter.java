@@ -15,4 +15,8 @@
  */
 package org.dominokit.brix.annotations;
 
+/**
+ * Marks a class as a Domino Brix presenter to trigger code generation of the presenter
+ * implementation and Dagger bindings.
+ */
 public @interface BrixPresenter {}

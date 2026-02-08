@@ -21,6 +21,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/** Default in-memory implementation of {@link Config}. */
 @Singleton
 public class ConfigImpl implements Config {
   private final Map<String, String> configs = new HashMap<>();
@@ -28,6 +29,12 @@ public class ConfigImpl implements Config {
   @Inject
   public ConfigImpl() {}
 
+  /**
+   * Initializes the configuration map. This method may only be called once.
+   *
+   * @param configs map of configuration entries
+   * @throws IllegalOperationException if called after initialization
+   */
   public void init(Map<String, String> configs) {
     if (!this.configs.isEmpty()) {
       throw new IllegalOperationException("Config have already been initialized.");
@@ -36,10 +43,12 @@ public class ConfigImpl implements Config {
   }
 
   @Override
+  /** {@inheritDoc} */
   public Optional<String> get(String key) {
     return Optional.ofNullable(configs.get(key));
   }
 
+  /** Thrown when attempting to mutate a sealed configuration. */
   public static final class IllegalOperationException extends RuntimeException {
     public IllegalOperationException(String message) {
       super(message);

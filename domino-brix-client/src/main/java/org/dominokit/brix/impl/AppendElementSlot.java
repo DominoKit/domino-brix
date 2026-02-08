@@ -24,6 +24,7 @@ import org.dominokit.brix.api.Viewable;
 import org.dominokit.domino.ui.IsElement;
 import org.dominokit.domino.ui.utils.DominoElement;
 
+/** Slot that appends view elements to a host element without clearing previous children. */
 public class AppendElementSlot implements Slot {
 
   public static final String APPEND_ELEMENT_SLOT = "brix-append-element-slot";

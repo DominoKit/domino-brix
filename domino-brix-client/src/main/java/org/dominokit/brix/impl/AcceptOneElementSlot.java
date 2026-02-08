@@ -25,6 +25,10 @@ import org.dominokit.brix.api.Viewable;
 import org.dominokit.domino.ui.IsElement;
 import org.dominokit.domino.ui.utils.DominoElement;
 
+/**
+ * Slot that clears its host element before revealing the incoming view, ensuring only one child is
+ * displayed at a time.
+ */
 public class AcceptOneElementSlot implements Slot {
 
   private static final String ACCEPT_ONE_ELEMENT_SLOT = "brix-accept-one-element-slot";

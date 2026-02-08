@@ -18,6 +18,13 @@ package org.dominokit.brix.api;
 import org.dominokit.domino.history.AppHistory;
 import org.dominokit.domino.history.DominoHistory;
 
+/**
+ * Base routing task for child presenters. Binds the child to its parent and activates it when the
+ * route matches.
+ *
+ * @param <P> parent presenter type
+ * @param <C> child presenter type
+ */
 public abstract class AbstractChildRoutingTask<
         P extends Presenter<?>, C extends ChildPresenter<P, ?>>
     implements RoutingTask {

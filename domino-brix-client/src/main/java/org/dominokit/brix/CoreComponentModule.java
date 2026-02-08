@@ -19,15 +19,23 @@ import dagger.Module;
 import javax.inject.Inject;
 
 @Module
+/**
+ * Dagger module that bridges a pre-built {@link CoreComponent} into generated presentation modules,
+ * allowing feature components to reuse the application's shared graph.
+ */
 public class CoreComponentModule implements PresentationModule {
   private CoreComponent coreComponent;
 
+  /** Wraps an existing {@link CoreComponent} to expose shared bindings to feature modules. */
   @Inject
   public CoreComponentModule(CoreComponent coreComponent) {
     this.coreComponent = coreComponent;
   }
 
   @Override
+  /**
+   * @return the backing core component
+   */
   public CoreComponent coreComponent() {
     return this.coreComponent;
   }

@@ -17,6 +17,13 @@ package org.dominokit.brix.api;
 
 import java.util.Optional;
 
+/** Lightweight key/value configuration map shared across the application. */
 public interface Config {
+  /**
+   * Retrieves the value associated with the given key.
+   *
+   * @param key configuration key
+   * @return optional value if present
+   */
   Optional<String> get(String key);
 }

@@ -25,11 +25,21 @@ import org.dominokit.brix.events.BrixEvents;
 import org.dominokit.brix.security.IsSecurityContext;
 import org.dominokit.domino.history.AppHistory;
 
+/**
+ * Exposes the core graph to feature modules. Implementations supply the {@link CoreComponent} that
+ * backs shared router, events, slots, and configuration bindings.
+ */
 @Module
 public interface PresentationModule {
 
+  /**
+   * @return the application-level core component
+   */
   CoreComponent coreComponent();
 
+  /**
+   * @return global router reference shared with feature components
+   */
   @Singleton
   @Provides
   @Global
@@ -37,6 +47,9 @@ public interface PresentationModule {
     return coreComponent().core().getRouter();
   }
 
+  /**
+   * @return shared event bus instance
+   */
   @Singleton
   @Provides
   @Global
@@ -44,6 +57,9 @@ public interface PresentationModule {
     return coreComponent().core().getEvents();
   }
 
+  /**
+   * @return shared slots registry
+   */
   @Singleton
   @Provides
   @Global
@@ -51,6 +67,9 @@ public interface PresentationModule {
     return coreComponent().core().getSlots();
   }
 
+  /**
+   * @return shared configuration holder
+   */
   @Singleton
   @Provides
   @Global
@@ -58,6 +77,9 @@ public interface PresentationModule {
     return coreComponent().core().getConfig();
   }
 
+  /**
+   * @return security context used by authorizers in presenters
+   */
   @Singleton
   @Provides
   default IsSecurityContext globalSecurityContext() {

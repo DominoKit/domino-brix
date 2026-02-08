@@ -20,14 +20,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Annotate a presenter proxy field with this annotation to inject a path expression parameter value
- * from the routing token
- */
+/** Marks a view field to be initialized with the generated UI handlers instance. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Handlers {
 
-  /** @return String name of the path parameter expression */
+  /**
+   * @return optional name override; defaults to the field name
+   */
   String value() default "";
 }

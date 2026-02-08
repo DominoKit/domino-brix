@@ -15,17 +15,33 @@
  */
 package org.dominokit.brix.api;
 
+/** A target location where presenters can reveal or remove {@link Viewable} instances. */
 public interface Slot {
   String BRIX_SLOT_KEY = "brix-slot-key";
   String BRIX_SLOT_TYPE = "brix-slot-type";
 
+  /**
+   * @return unique identifier for the slot
+   */
   String getKey();
 
+  /**
+   * Reveals the view inside this slot.
+   *
+   * @param view view to attach
+   */
   void reveal(Viewable view);
 
+  /**
+   * Removes the view from the slot.
+   *
+   * @param view view to detach
+   */
   void remove(Viewable view);
 
+  /** Hook invoked when the slot is registered. */
   default void onRegistered() {}
 
+  /** Hook invoked when the slot is removed. */
   default void onRemoved() {}
 }

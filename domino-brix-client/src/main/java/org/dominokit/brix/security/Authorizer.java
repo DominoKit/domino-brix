@@ -17,6 +17,17 @@ package org.dominokit.brix.security;
 
 import org.dominokit.brix.events.HasRoles;
 
+/**
+ * Strategy used by presenters to evaluate whether access should be granted based on the current
+ * security context and required roles.
+ */
 public interface Authorizer {
+  /**
+   * Determines if the context allows the resource represented by {@link HasRoles}.
+   *
+   * @param context security context containing the current user
+   * @param hasRoles instance exposing required roles
+   * @return {@code true} if access is permitted
+   */
   boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles);
 }

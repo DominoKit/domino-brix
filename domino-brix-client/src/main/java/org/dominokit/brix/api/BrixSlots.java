@@ -31,6 +31,10 @@ import org.dominokit.brix.impl.PopupSlot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Registry and dispatcher for named UI slots. Slots represent attachment points in the DOM where
+ * presenters reveal their views.
+ */
 public class BrixSlots {
   private static final Logger LOGGER = LoggerFactory.getLogger(BrixSlots.class);
   public static final String BRIX_BODY_SLOT = "brix-body-slot";
@@ -46,11 +50,23 @@ public class BrixSlots {
     register(NoContentSlot.create());
   }
 
+  /**
+   * Registers a listener for slot lifecycle events.
+   *
+   * @param listener listener to add
+   * @return registration record for un-listening
+   */
   public RegistrationRecord listen(SlotListener listener) {
     this.listeners.add(listener);
     return () -> listeners.remove(listener);
   }
 
+  /**
+   * Registers the slot and notifies listeners.
+   *
+   * @param slot slot implementation
+   * @return registration record that will unregister the slot
+   */
   public RegistrationRecord register(Slot slot) {
     LOGGER.info(" >> REGISTERING SLOT [" + slot.getKey() + "]");
 
@@ -64,6 +80,11 @@ public class BrixSlots {
     return () -> unRegister(slot);
   }
 
+  /**
+   * Unregisters a slot and triggers its removal callback.
+   *
+   * @param slot slot to remove
+   */
   public void unRegister(Slot slot) {
     LOGGER.info(" << REMOVING SLOT [" + slot.getKey() + "]");
     if (slots.containsKey(slot.getKey())) {
@@ -72,6 +93,12 @@ public class BrixSlots {
     }
   }
 
+  /**
+   * Looks up a slot by key.
+   *
+   * @param key slot identifier
+   * @return optional latest registered slot with that key
+   */
   public Optional<Slot> findSlot(String key) {
     if (isNull(key) || key.isEmpty() || !slots.containsKey(key)) {
       return Optional.empty();
@@ -79,15 +106,19 @@ public class BrixSlots {
     return Optional.ofNullable(slots.get(key).peek());
   }
 
+  /** Thrown when a presenter attempts to reveal without a registered slot. */
   public static class SlotNotDefinedException extends RuntimeException {
     public SlotNotDefinedException(String message) {
       super(message);
     }
   }
 
+  /** Listener for slot registration/removal events. */
   public interface SlotListener {
+    /** Called when a slot becomes available. */
     void onSlotRegistered(String key);
 
+    /** Called when a slot is removed. */
     void onSlotRemoved(String key);
   }
 }

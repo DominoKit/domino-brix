@@ -17,6 +17,7 @@ package org.dominokit.brix.api;
 
 import dagger.Lazy;
 
+/** Provides presenters lazily via Dagger's {@link Lazy} wrapper. */
 public abstract class PresenterProvider<P extends Presenter<?>> {
 
   private Lazy<P> presenter;
@@ -25,6 +26,9 @@ public abstract class PresenterProvider<P extends Presenter<?>> {
     this.presenter = presenter;
   }
 
+  /**
+   * @return the presenter instance, creating it on first access
+   */
   public P get() {
     return presenter.get();
   }

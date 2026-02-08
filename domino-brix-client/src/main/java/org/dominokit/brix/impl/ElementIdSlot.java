@@ -25,6 +25,7 @@ import org.dominokit.brix.api.Slot;
 import org.dominokit.brix.api.Viewable;
 import org.dominokit.domino.ui.IsElement;
 
+/** Slot that targets a DOM element by id and replaces its contents with the provided view. */
 public class ElementIdSlot implements Slot {
 
   private final String key;

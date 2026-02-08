@@ -15,6 +15,16 @@
  */
 package org.dominokit.brix.events;
 
+/**
+ * Describes the authenticated user interacting with the application. Implementations combine role
+ * information and profile data.
+ */
 public interface BrixUser extends HasRoles, UserProfile {
+
+  /**
+   * Indicates whether the user is authenticated.
+   *
+   * @return {@code true} if the user has been authenticated
+   */
   boolean isAuthenticated();
 }

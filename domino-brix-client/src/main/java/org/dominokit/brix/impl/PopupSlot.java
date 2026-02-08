@@ -22,6 +22,7 @@ import org.dominokit.brix.api.Slot;
 import org.dominokit.brix.api.Viewable;
 import org.dominokit.brix.api.ViewablePopup;
 
+/** Slot that opens and closes {@link ViewablePopup} implementations. */
 public class PopupSlot implements Slot {
 
   public static PopupSlot create() {

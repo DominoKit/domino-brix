@@ -15,6 +15,13 @@
  */
 package org.dominokit.brix.api;
 
+/**
+ * Implemented by views that want to receive attach/detach notifications from the DOM so presenters
+ * can coordinate lifecycle.
+ */
 public interface IsAttachable {
+  /**
+   * @return binder that wires attach/detach callbacks
+   */
   AttachableBinder getAttachableBinder();
 }

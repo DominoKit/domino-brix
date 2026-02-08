@@ -17,10 +17,15 @@ package org.dominokit.brix.security;
 
 import org.dominokit.brix.events.HasRoles;
 
+/**
+ * Authorizer that requires the user to be authenticated and to hold at least one of the roles
+ * exposed by the target {@link HasRoles}.
+ */
 public class RolesAllowedAuthorizer implements Authorizer {
   public static final Authorizer INSTANCE = new RolesAllowedAuthorizer();
 
   @Override
+  /** Grants access when authenticated and any required role matches. */
   public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
     return context.getUser().isAuthenticated() && context.isAuthorizedForAny(hasRoles.getRoles());
   }

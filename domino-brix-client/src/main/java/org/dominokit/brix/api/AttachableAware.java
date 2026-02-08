@@ -15,8 +15,11 @@
  */
 package org.dominokit.brix.api;
 
+/** Receives callbacks when a view is attached to or detached from the DOM. */
 public interface AttachableAware {
+  /** Invoked after the view is attached. */
   void onAttach();
 
+  /** Invoked after the view is detached. */
   void onDetach();
 }

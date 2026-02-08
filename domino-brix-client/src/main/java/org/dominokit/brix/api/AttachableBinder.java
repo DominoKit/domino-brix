@@ -15,6 +15,15 @@
  */
 package org.dominokit.brix.api;
 
+/**
+ * Helper that binds DOM attach/detach events to an {@link AttachableAware} listener. Concrete
+ * implementations integrate with the underlying UI toolkit.
+ */
 public abstract class AttachableBinder {
+  /**
+   * Wires attachable callbacks so they will be invoked when the view is attached or detached.
+   *
+   * @param attachableAware target to notify
+   */
   protected abstract void initAttachable(AttachableAware attachableAware);
 }

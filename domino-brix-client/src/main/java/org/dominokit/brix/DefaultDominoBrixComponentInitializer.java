@@ -17,7 +17,12 @@ package org.dominokit.brix;
 
 import org.dominokit.brix.api.BrixComponentInitializer;
 
+/**
+ * Fallback component initializer used when no generated components are present. Keeps the service
+ * file valid while doing nothing at runtime.
+ */
 public class DefaultDominoBrixComponentInitializer implements BrixComponentInitializer {
+  /** No-op initializer. */
   @Override
   public void init() {
     // Do nothing, required to compile when components yet existed.

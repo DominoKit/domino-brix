@@ -15,8 +15,14 @@
  */
 package org.dominokit.brix.api;
 
+/**
+ * Marker for components that participate in presenter lifecycle. Generated components implement
+ * these callbacks to mirror presenter activation.
+ */
 public interface BrixComponent {
+  /** Called when the owning presenter becomes active. */
   void onActivated();
 
+  /** Called when the owning presenter is deactivated. */
   void onDeactivated();
 }

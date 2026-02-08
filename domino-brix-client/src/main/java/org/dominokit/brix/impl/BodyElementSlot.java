@@ -27,6 +27,7 @@ import org.dominokit.domino.ui.IsElement;
 import org.dominokit.domino.ui.elements.BodyElement;
 import org.dominokit.domino.ui.utils.ElementsFactory;
 
+/** Slot that attaches views directly to the document body. */
 public class BodyElementSlot implements Slot {
 
   private BodyElement body = ElementsFactory.elements.body();

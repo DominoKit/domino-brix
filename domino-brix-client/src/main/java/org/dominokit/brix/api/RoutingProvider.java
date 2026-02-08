@@ -20,15 +20,28 @@ import static java.util.Objects.nonNull;
 
 import org.dominokit.domino.history.TokenFilter;
 
+/**
+ * Describes how a presenter maps to a history token. Generated routing classes implement this to
+ * provide routing paths and token filters.
+ */
 public interface RoutingProvider {
+  /**
+   * @return the routing path fragment for this presenter, default empty
+   */
   default String getRoutingPath() {
     return "";
   }
 
+  /**
+   * @return {@code true} if the path targets URL fragments (#) instead of regular paths
+   */
   default boolean isHashBasedRouting() {
     return containsHashInPath();
   }
 
+  /**
+   * @return {@code true} if the routing path contains a hash symbol
+   */
   default boolean containsHashInPath() {
     String path = getRoutingPath();
     if (nonNull(path) && !path.isEmpty()) {
@@ -37,6 +50,9 @@ public interface RoutingProvider {
     return false;
   }
 
+  /**
+   * @return a token filter that matches the routing path
+   */
   default TokenFilter tokenFilter() {
     String path = getRoutingPath();
     if (isNull(path) || path.trim().isEmpty()) {
@@ -48,6 +64,9 @@ public interface RoutingProvider {
     }
   }
 
+  /**
+   * @return alias to {@link #tokenFilter()}
+   */
   default TokenFilter getTokenFilter() {
     return tokenFilter();
   }

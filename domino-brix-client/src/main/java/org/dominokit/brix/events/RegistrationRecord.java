@@ -15,6 +15,8 @@
  */
 package org.dominokit.brix.events;
 
+/** Handle returned from registrations allowing callers to unsubscribe. */
 public interface RegistrationRecord {
+  /** Removes the registration. */
   void remove();
 }

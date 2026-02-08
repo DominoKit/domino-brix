@@ -15,9 +15,21 @@
  */
 package org.dominokit.brix.api;
 
+/**
+ * Implemented by views that can prompt the user before navigating away. Presenters automatically
+ * wire a history interceptor when the view implements this contract.
+ */
 public interface CanConfirmNavigation {
 
+  /**
+   * @return {@code true} if navigation should be confirmed
+   */
   boolean isConfirmNavigation();
 
+  /**
+   * Triggers the confirmation flow.
+   *
+   * @param handlers callbacks to signal confirmation or cancellation
+   */
   void confirmNavigation(ConfirmNavigationHandlers handlers);
 }

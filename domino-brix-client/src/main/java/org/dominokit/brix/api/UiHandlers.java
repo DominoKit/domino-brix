@@ -15,4 +15,5 @@
  */
 package org.dominokit.brix.api;
 
+/** Marker interface for view-to-presenter interaction contracts. */
 public interface UiHandlers {}

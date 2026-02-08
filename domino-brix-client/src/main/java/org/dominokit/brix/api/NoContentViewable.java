@@ -15,8 +15,11 @@
  */
 package org.dominokit.brix.api;
 
+/** Special view used when no content is available for a slot. */
 public interface NoContentViewable extends Viewable {
+  /** Called when the no-content view is revealed. */
   void onReveal();
 
+  /** Called when the no-content view is removed. */
   void onRemove();
 }

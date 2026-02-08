@@ -15,9 +15,12 @@
  */
 package org.dominokit.brix.api;
 
+/** Specialized view that can be opened and closed, typically attached to the popup slot. */
 public interface ViewablePopup extends Viewable {
 
+  /** Opens the popup. */
   void open();
 
+  /** Closes the popup. */
   void close();
 }

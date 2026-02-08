@@ -20,6 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/** Marks a concrete view implementation to generate the *_UiView subclass and bindings. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface UiView {}

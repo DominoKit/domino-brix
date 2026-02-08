@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dominokit.brix.annotations;
+package org.dominokit.brix.api;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.inject.Qualifier;
+/**
+ * Helper interface that maps {@link #handlers()} to {@link #getUiHandlers()} for views generated
+ * with handler awareness.
+ */
+public interface HandlersAware<U extends UiHandlers> extends HasUiHandlers<U> {
 
-/** Qualifier for injecting sets of {@link org.dominokit.brix.api.BrixStartupTask}. */
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
-public @interface BrixTask {}
+  /**
+   * @return lazily created UI handlers instance
+   */
+  default U handlers() {
+    return null;
+  }
+
+  /**
+   * @return UI handlers instance
+   */
+  default U getUiHandlers() {
+    return handlers();
+  }
+}

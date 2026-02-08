@@ -33,9 +33,15 @@ import org.dominokit.brix.tasks.TasksRunner;
 import org.dominokit.domino.client.history.StateHistory;
 import org.dominokit.domino.history.AppHistory;
 
+/**
+ * Default Dagger module supplying core framework singletons such as router, slots, events, and
+ * configuration. Applications can override bindings by providing their own module when building the
+ * component.
+ */
 @Module
 public class CoreModule {
 
+  /** Supplies the default Domino History router implementation. */
   @Singleton
   @Provides
   @Global
@@ -43,12 +49,14 @@ public class CoreModule {
     return new StateHistory();
   }
 
+  /** Provides the startup task runner used during application boot. */
   @Singleton
   @Provides
   public TasksRunner tasksRunner() {
     return new TasksRunner();
   }
 
+  /** Creates a shared in-memory event bus. */
   @Singleton
   @Provides
   @Global
@@ -56,6 +64,7 @@ public class CoreModule {
     return new BrixEvents();
   }
 
+  /** Creates the global slots registry used by presenters. */
   @Singleton
   @Provides
   @Global
@@ -63,12 +72,14 @@ public class CoreModule {
     return new BrixSlots();
   }
 
+  /** Provides the default security context implementation. */
   @Singleton
   @Provides
   public IsSecurityContext securityContext() {
     return new SecurityContext();
   }
 
+  /** Provides the mutable configuration map wrapper. */
   @Singleton
   @Provides
   @Global
@@ -76,6 +87,7 @@ public class CoreModule {
     return new ConfigImpl();
   }
 
+  /** Supplies an empty list of startup tasks when none are registered. */
   @Provides
   @BrixTask
   public static List<BrixStartupTask> provideEmptyTasksSet() {

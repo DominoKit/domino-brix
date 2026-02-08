@@ -31,6 +31,10 @@ import org.dominokit.domino.history.AppHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Core runtime services holder created by Dagger. Exposes globally shared router, event bus, slots,
+ * configuration, security context, and startup runner used by the framework.
+ */
 @Singleton
 public class BrixCore {
 
@@ -58,34 +62,63 @@ public class BrixCore {
     this.securityContext = securityContext;
   }
 
+  /**
+   * @return shared application router
+   */
   public AppHistory getRouter() {
     return router;
   }
 
+  /**
+   * @return shared event bus
+   */
   public BrixEvents getEvents() {
     return this.events;
   }
 
+  /**
+   * @return shared slots registry
+   */
   public BrixSlots getSlots() {
     return this.slots;
   }
 
+  /**
+   * @return shared configuration holder
+   */
   public Config getConfig() {
     return this.config;
   }
 
+  /**
+   * @return security context used by authorizers
+   */
   public SecurityContext getSecurityContext() {
     return securityContext;
   }
 
+  /**
+   * @return orchestrator responsible for ordered startup tasks
+   */
   public TasksRunner getTasksRunner() {
     return tasksRunner;
   }
 
+  /**
+   * Initializes configuration with the provided map.
+   *
+   * @param config key/value config entries
+   */
   public void init(Map<String, String> config) {
     ((ConfigImpl) getConfig()).init(config);
   }
 
+  /**
+   * Executes the supplied startup tasks and notifies the handler upon completion.
+   *
+   * @param tasks tasks to execute grouped by their order
+   * @param handler callback invoked when all tasks finish
+   */
   public void start(Set<BrixStartupTask> tasks, Runnable handler) {
     tasksRunner.runTasks(tasks, handler);
   }

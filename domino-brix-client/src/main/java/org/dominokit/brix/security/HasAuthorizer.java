@@ -15,6 +15,10 @@
  */
 package org.dominokit.brix.security;
 
+/** Provides an {@link Authorizer} used to evaluate access to a resource or presenter. */
 public interface HasAuthorizer {
+  /**
+   * @return the authorizer to use for permission checks
+   */
   Authorizer getAuthorizer();
 }

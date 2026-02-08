@@ -20,10 +20,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/** Declares the slot key a presenter reveals into. */
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})
 public @interface BrixSlot {
 
-  /** @return the String module name */
+  /**
+   * @return the String module name
+   */
   String value();
 }

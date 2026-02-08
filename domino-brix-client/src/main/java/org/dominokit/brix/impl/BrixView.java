@@ -20,25 +20,20 @@ import static java.util.Objects.isNull;
 import elemental2.dom.Element;
 import org.dominokit.brix.api.AttachableAware;
 import org.dominokit.brix.api.AttachableBinder;
-import org.dominokit.brix.api.HasUiHandlers;
+import org.dominokit.brix.api.HandlersAware;
 import org.dominokit.brix.api.UiHandlers;
 import org.dominokit.brix.api.View;
 import org.dominokit.brix.api.ViewablePopup;
 import org.dominokit.domino.ui.utils.BaseDominoElement;
 
+/**
+ * Base view implementation built on Domino UI elements. Provides attachable binding and optional UI
+ * handlers wiring for generated views.
+ */
 public abstract class BrixView<E extends Element, U extends UiHandlers>
-    extends BaseDominoElement<E, BrixView<E, U>> implements View, HasUiHandlers<U> {
+    extends BaseDominoElement<E, BrixView<E, U>> implements View, HandlersAware<U> {
 
   private AttachableBinder attachableBinder;
-
-  protected U handlers() {
-    return null;
-  }
-
-  @Override
-  public U getUiHandlers() {
-    return handlers();
-  }
 
   @Override
   public AttachableBinder getAttachableBinder() {

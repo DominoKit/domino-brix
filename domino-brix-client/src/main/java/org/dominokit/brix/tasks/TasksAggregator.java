@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 import org.dominokit.brix.api.BrixStartupTask;
 import org.dominokit.domino.api.shared.extension.ContextAggregator;
 
+/**
+ * Aggregates tasks sharing the same order and executes them before triggering the next aggregator.
+ */
 public class TasksAggregator extends ContextAggregator.ContextWait<Void>
     implements Comparable<TasksAggregator> {
   private ContextAggregator contextAggregator;
@@ -29,6 +32,10 @@ public class TasksAggregator extends ContextAggregator.ContextWait<Void>
   private TasksAggregator nextAggregator;
   private Integer order;
 
+  /**
+   * @param order order value shared by the tasks
+   * @param tasks tasks that should run together
+   */
   public TasksAggregator(int order, List<BrixStartupTask> tasks) {
     this.order = order;
     this.tasks = tasks;
@@ -44,16 +51,19 @@ public class TasksAggregator extends ContextAggregator.ContextWait<Void>
                 });
   }
 
+  /** Links the next aggregator to trigger once this one completes. */
   public TasksAggregator setNextAggregator(TasksAggregator nextAggregator) {
     this.nextAggregator = nextAggregator;
     return this;
   }
 
+  /** Executes all tasks associated with this aggregator. */
   public void execute() {
     tasks.forEach(BrixStartupTask::run);
   }
 
   @Override
+  /** Sorts aggregators by their order value. */
   public int compareTo(TasksAggregator o) {
     return this.order.compareTo(o.order);
   }

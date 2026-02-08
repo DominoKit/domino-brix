@@ -19,8 +19,19 @@ import static java.util.Objects.nonNull;
 
 import java.util.Set;
 
+/**
+ * Allows storing and propagating a typed context object with lifecycle operations to interested
+ * listeners.
+ *
+ * @param <T> type that owns the context
+ */
 public interface HasContext<T> {
 
+  /**
+   * Updates the context and notifies listeners.
+   *
+   * @param context new context value
+   */
   default void update(IsContext<T> context) {
     setContext(context);
     getContextListeners()
@@ -30,12 +41,25 @@ public interface HasContext<T> {
             });
   }
 
+  /** Sets the current context. */
   void setContext(IsContext<T> context);
 
+  /**
+   * @return current context value
+   */
   IsContext<T> getContext();
 
+  /**
+   * @return listeners interested in context changes
+   */
   Set<ContextListener<T>> getContextListeners();
 
+  /**
+   * Registers a listener and immediately notifies it if context already exists.
+   *
+   * @param contextListener listener to add
+   * @return this instance for chaining
+   */
   default T registerContextListener(ContextListener<T> contextListener) {
     getContextListeners().add(contextListener);
     if (nonNull(getContext()) && nonNull(getContext().getData())) {
@@ -44,15 +68,23 @@ public interface HasContext<T> {
     return (T) this;
   }
 
+  /**
+   * Removes a context listener.
+   *
+   * @param contextListener listener to remove
+   * @return this instance for chaining
+   */
   default T removeContextListener(ContextListener<? super T> contextListener) {
     getContextListeners().remove(contextListener);
     return (T) this;
   }
 
+  /** Listener notified when the context changes. */
   interface ContextListener<T> {
     void onContextChange(IsContext<T> context);
   }
 
+  /** Describes an operation performed on the context payload. */
   interface Operation {
     Operation CREATED = () -> "CREATED";
     Operation UPDATED = () -> "UPDATED";
@@ -72,42 +104,59 @@ public interface HasContext<T> {
     }
   }
 
+  /** Wrapper for context data, operation type, and source. */
   interface IsContext<T> {
+    /**
+     * @return context data
+     */
     T getData();
 
+    /**
+     * @return operation performed on the data
+     */
     default Operation getOperation() {
       return Operation.UPDATED;
     }
 
+    /**
+     * @return source object that produced the context
+     */
     Object getSource();
 
+    /** Factory to create a context with explicit operation. */
     static <T> IsContext<T> of(Object source, T data, Operation operation) {
       return new IsContext<T>() {
         @Override
+        /** {@inheritDoc} */
         public T getData() {
           return data;
         }
 
         @Override
+        /** {@inheritDoc} */
         public Object getSource() {
           return source;
         }
 
         @Override
+        /** {@inheritDoc} */
         public Operation getOperation() {
           return operation;
         }
       };
     }
 
+    /** Creates an UPDATED context wrapper. */
     static <T> IsContext<T> updated(Object source, T data) {
       return of(source, data, Operation.UPDATED);
     }
 
+    /** Creates a DELETED context wrapper. */
     static <T> IsContext<T> deleted(Object source, T data) {
       return of(source, data, Operation.DELETED);
     }
 
+    /** Creates a CREATED context wrapper. */
     static <T> IsContext<T> created(Object source, T data) {
       return of(source, data, Operation.CREATED);
     }

@@ -19,11 +19,15 @@ import org.dominokit.domino.history.HistoryToken;
 import org.dominokit.domino.history.NormalizedToken;
 import org.dominokit.domino.history.TokenFilter;
 
+/** Combines a root token filter with additional filters using logical AND. */
 public class CompositeFilter implements TokenFilter {
 
   private final TokenFilter root;
   private final TokenFilter[] subFilters;
 
+  /**
+   * @return new composite filter composed of the root and sub-filters
+   */
   public static CompositeFilter of(TokenFilter root, TokenFilter... subFilters) {
     return new CompositeFilter(root, subFilters);
   }

@@ -18,8 +18,15 @@ package org.dominokit.brix;
 import dagger.Component;
 import javax.inject.Singleton;
 
+/**
+ * Dagger component wiring the core runtime graph. Provides the singleton {@link BrixCore} instance
+ * consumed by the {@link Brix} facade.
+ */
 @Singleton
 @Component(modules = CoreModule.class)
 public interface CoreComponent {
+  /**
+   * @return configured core services container
+   */
   BrixCore core();
 }

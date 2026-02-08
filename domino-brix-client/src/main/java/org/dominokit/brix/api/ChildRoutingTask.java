@@ -15,4 +15,5 @@
  */
 package org.dominokit.brix.api;
 
+/** Marker for routing tasks specific to child presenters. */
 public abstract class ChildRoutingTask implements RoutingTask {}

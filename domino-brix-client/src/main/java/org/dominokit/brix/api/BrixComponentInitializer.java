@@ -15,6 +15,11 @@
  */
 package org.dominokit.brix.api;
 
+/**
+ * Bootstrap contract for generated components. Implementations register their presenters/routes
+ * with the {@link RouterManager} when invoked.
+ */
 public interface BrixComponentInitializer {
+  /** Initializes the component registrations. */
   void init();
 }

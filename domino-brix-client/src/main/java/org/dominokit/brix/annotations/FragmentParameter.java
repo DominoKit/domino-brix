@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface FragmentParameter {
 
-  /** @return String name of the fragment parameter */
+  /**
+   * @return String name of the fragment parameter
+   */
   String value() default "";
 }

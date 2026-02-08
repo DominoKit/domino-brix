@@ -29,6 +29,10 @@ import org.dominokit.brix.events.UserAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Default in-memory security context that stores the current {@link BrixUser} and exposes helpers
+ * for role-based authorization checks.
+ */
 @Singleton
 public class SecurityContext implements IsSecurityContext {
 
@@ -43,36 +47,72 @@ public class SecurityContext implements IsSecurityContext {
   @Inject
   public SecurityContext() {}
 
+  /**
+   * @return the current user or a null-safe stub when not set
+   */
   public BrixUser getUser() {
     return nonNull(user) ? user : NULL_USER;
   }
 
   @Override
+  /**
+   * @return {@code true} when the current user reports authentication
+   */
   public boolean isAuthenticated() {
     return getUser().isAuthenticated();
   }
 
+  /**
+   * Sets the active user for subsequent authorization checks.
+   *
+   * @param user authenticated user instance
+   * @return this context for chaining
+   */
   public SecurityContext setUser(BrixUser user) {
     this.user = user;
     return this;
   }
 
+  /**
+   * Overrides the handler invoked when unauthorized access is detected.
+   *
+   * @param handler callback executed on denied access
+   */
   public void setUnauthorizedAccessHandler(Runnable handler) {
     this.unauthorizedAccessHandler = handler;
   }
 
+  /** Triggers the unauthorized access handler. */
   public void reportUnAuthorizedAccess() {
     unauthorizedAccessHandler.run();
   }
 
+  /**
+   * Checks if the current user holds the specified role.
+   *
+   * @param role role name
+   * @return {@code true} when the role is granted
+   */
   public boolean isAuthorizedFor(String role) {
     return getUser().getRoles().contains(role);
   }
 
+  /**
+   * Checks if the user has all of the provided roles.
+   *
+   * @param roles role names
+   * @return {@code true} when every role is present
+   */
   public boolean isAuthorizedForAll(String... roles) {
     return isAuthorizedForAll(Arrays.asList(roles));
   }
 
+  /**
+   * Checks if the user has all of the provided roles.
+   *
+   * @param roles collection of role names
+   * @return {@code true} when every role is present
+   */
   public boolean isAuthorizedForAll(Collection<String> roles) {
     if (isNull(roles)) {
       return false;
@@ -80,10 +120,22 @@ public class SecurityContext implements IsSecurityContext {
     return getUser().getRoles().containsAll(roles);
   }
 
+  /**
+   * Checks if the user has any of the provided roles.
+   *
+   * @param roles role names
+   * @return {@code true} when at least one role is present
+   */
   public boolean isAuthorizedForAny(String... roles) {
     return isAuthorizedForAny(Arrays.asList(roles));
   }
 
+  /**
+   * Checks if the user has any of the provided roles.
+   *
+   * @param roles role names
+   * @return {@code true} when at least one role is present
+   */
   public boolean isAuthorizedForAny(Collection<String> roles) {
     if (isNull(roles)) {
       return false;

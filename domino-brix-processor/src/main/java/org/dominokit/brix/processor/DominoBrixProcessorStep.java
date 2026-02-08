@@ -430,7 +430,7 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
       MethodSpec.Builder getView =
           MethodSpec.methodBuilder("handlers")
               .addAnnotation(Override.class)
-              .addModifiers(Modifier.PROTECTED)
+              .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
               .returns(handlersType)
               .addStatement(
                   "return $T.ofNullable(super.handlers())\n" + "        .orElse($L$L())",
@@ -447,7 +447,7 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
       MethodSpec.Builder getHandlers =
           MethodSpec.methodBuilder("handlers")
               .addAnnotation(Override.class)
-              .addModifiers(Modifier.PROTECTED)
+              .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
               .returns(handlersType)
               .addStatement(
                   "return $T.ofNullable(super.handlers())\n" + "        .orElse($L.get())",

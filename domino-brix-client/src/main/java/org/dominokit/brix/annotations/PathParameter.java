@@ -28,6 +28,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface PathParameter {
 
-  /** @return String name of the path parameter expression */
+  /**
+   * @return String name of the path parameter expression
+   */
   String value() default "";
 }

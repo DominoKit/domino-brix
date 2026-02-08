@@ -17,10 +17,15 @@ package org.dominokit.brix.security;
 
 import org.dominokit.brix.events.HasRoles;
 
+/**
+ * Authorizer that grants access to any authenticated user. Use for resources protected only by
+ * authentication.
+ */
 public class PermitAllAuthorizer implements Authorizer {
   public static final Authorizer INSTANCE = new PermitAllAuthorizer();
 
   @Override
+  /** Allows access when the security context reports an authenticated user. */
   public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
     return context.getUser().isAuthenticated();
   }

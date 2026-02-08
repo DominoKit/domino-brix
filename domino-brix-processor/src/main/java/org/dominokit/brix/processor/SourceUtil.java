@@ -209,9 +209,14 @@ public class SourceUtil {
     try {
       TypeMirror superclass = ((TypeElement) element).getSuperclass();
       if (superclass.getKind().equals(TypeKind.NONE)) {
-        return Optional.empty();
+        return findInInterfaces(element, target);
       } else {
-        return findTypeArgument(superclass, target);
+        result = findTypeArgument(superclass, target);
+        if (result.isPresent()) {
+          return result;
+        } else {
+          return findInInterfaces(element, target);
+        }
       }
     } catch (Exception e) {
       env.messager()
@@ -219,6 +224,24 @@ public class SourceUtil {
               Diagnostic.Kind.WARNING, "element : " + element.getSimpleName().toString(), element);
       return Optional.empty();
     }
+  }
+
+  private Optional<? extends TypeMirror> findInInterfaces(Element element, Class<?> target) {
+    TypeElement typeElement = (TypeElement) element;
+    return typeElement.getInterfaces().stream()
+        .map(typeMirror -> findTypeArgument(typeMirror, target))
+        .filter(Optional::isPresent)
+        .findFirst()
+        .orElse(Optional.empty());
+  }
+
+  private Optional<? extends TypeMirror> findInInterfaces(TypeMirror typeMirror, Class<?> target) {
+    TypeElement element = (TypeElement) env.types().asElement(typeMirror);
+    return element.getInterfaces().stream()
+        .map(entry -> findTypeArgument(entry, target))
+        .filter(Optional::isPresent)
+        .findFirst()
+        .orElse(Optional.empty());
   }
 
   /**
@@ -242,9 +265,14 @@ public class SourceUtil {
     }
     TypeMirror superclass = ((TypeElement) env.types().asElement(type)).getSuperclass();
     if (superclass.getKind().equals(TypeKind.NONE)) {
-      return Optional.empty();
+      return findInInterfaces(type, target);
     } else {
-      return findTypeArgument(superclass, target);
+      result = findTypeArgument(superclass, target);
+      if (result.isPresent()) {
+        return result;
+      } else {
+        return findInInterfaces(type, target);
+      }
     }
   }
 
@@ -368,6 +396,7 @@ public class SourceUtil {
         getAnnotatedElements((TypeElement) env.types().asElement(superclass), annotation, filter));
     return methods;
   }
+
   /**
    * Returns all elements annotated with an annotation based on a filter
    *

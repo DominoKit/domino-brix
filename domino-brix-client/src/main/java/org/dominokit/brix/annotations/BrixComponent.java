@@ -22,6 +22,10 @@ import java.lang.annotation.Target;
 import org.dominokit.brix.api.IsBrixComponent;
 import org.dominokit.brix.api.Presenter;
 
+/**
+ * Marks a component that pairs a presenter with optional parent component to generate routing and
+ * initializer services.
+ */
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})
 public @interface BrixComponent {

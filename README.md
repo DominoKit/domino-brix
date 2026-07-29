@@ -22,6 +22,30 @@ Domino Brix is a lightweight, annotation-processor-driven MVP framework for Domi
 - `domino-brix-processor`: annotation processor and source generation.
 - `domino-brix-shared`: shared models (events and user abstractions).
 
+## Create a project 
+- The DominoKit CLI documentation is available at [DominoKit CLI](https://dominokit.com/resources/domino-cli).
+
+Generate a Domino Brix app scaffold:
+
+```bash
+dominokit generate brix-app \
+  -n <name> \
+  [-g <groupId>] \
+  [-d <absoluteOutputDir>] \
+  [-dev] \
+  [--generate-api[=<true|false>]]
+```
+
+Create a module inside an existing DominoKit project:
+
+```bash
+dominokit generate module \
+  -n <name> \
+  [-sp <subPackage>] \
+  [-p <prefix>] \
+  [-d <absoluteOutputDir>]
+```
+
 ## Build and test
 - Java 17 project (compiler release 11 bytecode).
 - Run `mvn verify` at the repository root.
@@ -40,11 +64,8 @@ Brix.get().start(startupTasks, () -> {
 ```
 
 ## Documentation
-- Draft docs live in `docs/`.
-- `docs/sample` contains a sample Domino Brix application layout.
+- The published Domino Brix documentation starts at [Getting Started](https://dominokit.com/solutions/domino-brix/docs/getting-started).
 
 ## License
-See `LICENSE`.
+Domino Brix is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full text.
  
-
-

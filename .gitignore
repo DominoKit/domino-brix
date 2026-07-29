@@ -12,3 +12,4 @@ dependency-reduced-pom.xml
 gwt-unitCache
 hs_err*
 **/pom.xml.versionsBackup
+/AI_CONTEXT.md

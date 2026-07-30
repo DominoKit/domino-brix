@@ -30,9 +30,16 @@ import org.dominokit.brix.api.Presenter;
 @Target({ElementType.TYPE})
 public @interface BrixComponent {
 
+  /**
+   * @return presenter class for this component
+   */
   Class<? extends Presenter<?>> presenter();
 
+  /**
+   * @return parent component type, or {@link NonParent} when this is a root component
+   */
   Class<? extends IsBrixComponent> parent() default NonParent.class;
 
+  /** Marker type used when a component has no parent. */
   public final class NonParent implements IsBrixComponent {}
 }

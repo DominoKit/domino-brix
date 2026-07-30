@@ -20,9 +20,9 @@ import static java.util.Objects.nonNull;
 import java.util.Optional;
 
 /**
- * Base type for events dispatched through {@link org.dominokit.brix.events.BrixEvents}. Concrete
- * subclasses carry payload specific to a feature. The framework records the source when events are
- * fired to help consumers trace the origin.
+ * Base type for events dispatched through the framework event bus. Concrete subclasses carry
+ * payload specific to a feature. The framework records the source when events are fired to help
+ * consumers trace the origin.
  */
 public abstract class BrixEvent {
 
@@ -30,10 +30,16 @@ public abstract class BrixEvent {
   private final long timestamp;
   private final String eventId;
 
+  /** Creates an event without an explicit source. */
   protected BrixEvent() {
     this(null);
   }
 
+  /**
+   * Creates an event with an explicit source.
+   *
+   * @param source event source
+   */
   protected BrixEvent(Object source) {
     this.source = source;
     this.timestamp = System.currentTimeMillis();

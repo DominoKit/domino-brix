@@ -30,11 +30,15 @@ import org.dominokit.brix.api.RoutingProvider;
 public @interface BrixRoute {
 
   /**
-   * @return the String module name
+   * @return the route path
    */
   String value() default "";
 
+  /**
+   * @return routing provider class to use for this presenter
+   */
   Class<? extends RoutingProvider> router() default UnspecifiedRouter.class;
 
+  /** Default marker provider used when no explicit router is supplied. */
   public final class UnspecifiedRouter implements RoutingProvider {}
 }

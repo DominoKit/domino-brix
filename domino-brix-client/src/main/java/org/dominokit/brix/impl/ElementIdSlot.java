@@ -30,10 +30,23 @@ public class ElementIdSlot implements Slot {
 
   private final String key;
 
+  /** Creates a slot targeting the element with the given id. */
+  /**
+   * Creates a slot targeting the element with the given id.
+   *
+   * @param key slot key
+   * @return slot wrapper
+   */
   public static ElementIdSlot of(String key) {
     return new ElementIdSlot(key);
   }
 
+  /** Creates a slot targeting the element with the given id. */
+  /**
+   * Creates a slot targeting the element with the given id.
+   *
+   * @param key slot key
+   */
   public ElementIdSlot(String key) {
     this.key = key;
   }

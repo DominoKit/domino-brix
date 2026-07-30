@@ -17,6 +17,10 @@ package org.dominokit.brix;
 
 import org.dominokit.brix.api.PresenterProvider;
 
+/** Exposes a presenter provider for classes that delegate presenter creation. */
 public interface HasPresenterProvider<P extends PresenterProvider<?>> {
+  /**
+   * @return the presenter provider
+   */
   P getPresenterProvider();
 }

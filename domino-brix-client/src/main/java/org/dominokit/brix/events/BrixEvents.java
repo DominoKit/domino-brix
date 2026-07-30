@@ -36,7 +36,11 @@ public class BrixEvents {
     return () -> unregister(listener);
   }
 
-  /** Removes the listener from the bus. */
+  /**
+   * Removes a previously registered listener from the bus.
+   *
+   * @param listener listener to remove
+   */
   public void unregister(EventListener listener) {
     listeners.remove(listener);
   }

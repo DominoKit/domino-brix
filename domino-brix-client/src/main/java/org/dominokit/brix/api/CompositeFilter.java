@@ -26,12 +26,22 @@ public class CompositeFilter implements TokenFilter {
   private final TokenFilter[] subFilters;
 
   /**
+   * Creates a composite filter.
+   *
+   * @param root primary token filter
+   * @param subFilters additional filters that must also match
    * @return new composite filter composed of the root and sub-filters
    */
   public static CompositeFilter of(TokenFilter root, TokenFilter... subFilters) {
     return new CompositeFilter(root, subFilters);
   }
 
+  /**
+   * Creates a composite filter.
+   *
+   * @param root primary token filter
+   * @param subFilters additional filters that must also match
+   */
   public CompositeFilter(TokenFilter root, TokenFilter... subFilters) {
     this.root = root;
     this.subFilters = subFilters;

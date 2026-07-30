@@ -56,7 +56,7 @@
         <dependency>
             <groupId>org.dominokit</groupId>
             <artifactId>domino-aggregator-shared</artifactId>
-            <version>1.0.3</version>
+            <version>${domino.aggregator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dominokit</groupId>
@@ -66,7 +66,12 @@
         <dependency>
             <groupId>org.dominokit</groupId>
             <artifactId>domino-slf4j-logger</artifactId>
-            <version>1.0.2</version>
+            <version>${domino.slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dominokit</groupId>
@@ -78,7 +83,6 @@
             <artifactId>domino-auto-api</artifactId>
             <version>${domino.auto.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.dominokit/domino-aggregator-shared -->
     </dependencies>
 
     <build>

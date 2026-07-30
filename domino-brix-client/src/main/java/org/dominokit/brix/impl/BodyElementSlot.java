@@ -36,6 +36,11 @@ public class BodyElementSlot implements Slot {
 
   private Viewable currentView;
 
+  /**
+   * Returns the singleton body slot instance.
+   *
+   * @return singleton body slot instance
+   */
   public static BodyElementSlot create() {
     return INSTANCE;
   }

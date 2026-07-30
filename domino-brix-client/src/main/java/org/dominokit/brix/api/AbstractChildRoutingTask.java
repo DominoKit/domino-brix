@@ -32,6 +32,12 @@ public abstract class AbstractChildRoutingTask<
 
   private final DominoHistory.StateListener listener;
 
+  /**
+   * Creates a child routing task for the given parent and presenter.
+   *
+   * @param parent parent presenter
+   * @param presenter child presenter to activate when the route matches
+   */
   public AbstractChildRoutingTask(P parent, C presenter) {
     this.history = parent.getRouter();
     bind(parent, presenter);
@@ -43,6 +49,12 @@ public abstract class AbstractChildRoutingTask<
     //    this.history.listen(presenter.getTokenFilter(), listener);
   }
 
+  /**
+   * Binds the child presenter to its parent presenter.
+   *
+   * @param parent parent presenter
+   * @param child child presenter
+   */
   protected void bind(P parent, C child) {
     child.setParent(parent);
     child.onBindParent(parent);

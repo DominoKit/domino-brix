@@ -44,6 +44,7 @@ public class SecurityContext implements IsSecurityContext {
         LOGGER.error("Access denied, user does not have the required roles.");
       };
 
+  /** Creates an empty security context with a deny-by-default fallback user. */
   @Inject
   public SecurityContext() {}
 

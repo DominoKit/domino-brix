@@ -101,11 +101,17 @@ import org.dominokit.brix.security.DenyAllAuthorizer;
 import org.dominokit.brix.security.PermitAllAuthorizer;
 import org.dominokit.brix.security.RolesAllowedAuthorizer;
 
+/** Processing step that generates Brix implementation and wiring classes. */
 public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, HasProcessorEnv {
 
   private final ProcessingEnvironment processingEnv;
   private final SourceUtil sourceUtil;
 
+  /**
+   * Creates a processor step bound to the current processing environment.
+   *
+   * @param processingEnv active annotation processing environment
+   */
   public DominoBrixProcessorStep(ProcessingEnvironment processingEnv) {
     this.processingEnv = processingEnv;
     this.sourceUtil = new SourceUtil(this);
@@ -618,6 +624,12 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
     }
   }
 
+  /**
+   * Converts a slot name into the generated getter method name.
+   *
+   * @param slotName slot identifier
+   * @return generated method name
+   */
   public String slotAsMethodName(String slotName) {
     String methodName =
         Arrays.stream(slotName.split("-|\\."))
@@ -626,6 +638,12 @@ public class DominoBrixProcessorStep implements BasicAnnotationProcessor.Step, H
     return "get" + methodName + "Slot";
   }
 
+  /**
+   * Converts a slot name into the generated field name.
+   *
+   * @param slotName slot identifier
+   * @return generated field name
+   */
   public String slotAsFieldName(String slotName) {
     String fieldName =
         Arrays.stream(slotName.split("-|\\."))

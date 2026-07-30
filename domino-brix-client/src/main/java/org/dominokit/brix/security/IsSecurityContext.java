@@ -34,11 +34,13 @@ public interface IsSecurityContext {
   boolean isAuthenticated();
 
   /**
+   * @param role required role
    * @return {@code true} when the user has the given role
    */
   boolean isAuthorizedFor(String role);
 
   /**
+   * @param roles required roles
    * @return {@code true} when the user has all provided roles
    */
   boolean isAuthorizedForAll(String... roles);
@@ -47,16 +49,19 @@ public interface IsSecurityContext {
   void reportUnAuthorizedAccess();
 
   /**
+   * @param roles required roles
    * @return {@code true} when the user has all provided roles
    */
   boolean isAuthorizedForAll(Collection<String> roles);
 
   /**
+   * @param roles required roles
    * @return {@code true} when the user has any of the provided roles
    */
   boolean isAuthorizedForAny(String... roles);
 
   /**
+   * @param roles required roles
    * @return {@code true} when the user has any of the provided roles
    */
   boolean isAuthorizedForAny(Collection<String> roles);

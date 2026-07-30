@@ -22,10 +22,11 @@ import org.dominokit.brix.events.HasRoles;
  * authentication.
  */
 public class PermitAllAuthorizer implements Authorizer {
+  /** Shared singleton authorizer instance. */
   public static final Authorizer INSTANCE = new PermitAllAuthorizer();
 
-  @Override
   /** Allows access when the security context reports an authenticated user. */
+  @Override
   public boolean isAuthorized(IsSecurityContext context, HasRoles hasRoles) {
     return context.getUser().isAuthenticated();
   }

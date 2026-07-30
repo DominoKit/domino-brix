@@ -41,6 +41,11 @@ public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V 
   }
 
   /** Sets the parent presenter instance. */
+  /**
+   * Sets the parent presenter instance.
+   *
+   * @param parent parent presenter
+   */
   public void setParent(P parent) {
     this.parent = parent;
   }
@@ -48,6 +53,8 @@ public abstract class ChildPresenter<P extends Presenter<? extends Viewable>, V 
   /**
    * Hook invoked when binding to a parent. Override to coordinate child/parent state before
    * activation.
+   *
+   * @param parent parent presenter
    */
   public void onBindParent(P parent) {}
 }

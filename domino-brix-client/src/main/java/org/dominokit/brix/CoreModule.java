@@ -41,7 +41,11 @@ import org.dominokit.domino.history.AppHistory;
 @Module
 public class CoreModule {
 
-  /** Supplies the default Domino History router implementation. */
+  /**
+   * Supplies the default Domino History router implementation.
+   *
+   * @return the shared router
+   */
   @Singleton
   @Provides
   @Global
@@ -49,14 +53,22 @@ public class CoreModule {
     return new StateHistory();
   }
 
-  /** Provides the startup task runner used during application boot. */
+  /**
+   * Provides the startup task runner used during application boot.
+   *
+   * @return the shared startup task runner
+   */
   @Singleton
   @Provides
   public TasksRunner tasksRunner() {
     return new TasksRunner();
   }
 
-  /** Creates a shared in-memory event bus. */
+  /**
+   * Creates a shared in-memory event bus.
+   *
+   * @return the shared event bus
+   */
   @Singleton
   @Provides
   @Global
@@ -64,7 +76,11 @@ public class CoreModule {
     return new BrixEvents();
   }
 
-  /** Creates the global slots registry used by presenters. */
+  /**
+   * Creates the global slots registry used by presenters.
+   *
+   * @return the shared slot registry
+   */
   @Singleton
   @Provides
   @Global
@@ -72,14 +88,22 @@ public class CoreModule {
     return new BrixSlots();
   }
 
-  /** Provides the default security context implementation. */
+  /**
+   * Provides the default security context implementation.
+   *
+   * @return the shared security context
+   */
   @Singleton
   @Provides
   public IsSecurityContext securityContext() {
     return new SecurityContext();
   }
 
-  /** Provides the mutable configuration map wrapper. */
+  /**
+   * Provides the mutable configuration map wrapper.
+   *
+   * @return the shared configuration holder
+   */
   @Singleton
   @Provides
   @Global
@@ -87,7 +111,11 @@ public class CoreModule {
     return new ConfigImpl();
   }
 
-  /** Supplies an empty list of startup tasks when none are registered. */
+  /**
+   * Supplies an empty list of startup tasks when none are registered.
+   *
+   * @return an empty startup task list
+   */
   @Provides
   @BrixTask
   public static List<BrixStartupTask> provideEmptyTasksSet() {

@@ -71,13 +71,14 @@
         <maven.spotless.plugin>2.43.0</maven.spotless.plugin>
         <maven.install.plugin>3.0.0-M1</maven.install.plugin>
         <maven.license.plugin>3.0</maven.license.plugin>
-        <maven.surfire.plugin>3.0.0-M1</maven.surfire.plugin>
         <maven.gwt.plugin>1.1.0</maven.gwt.plugin>
 
-        <jackson.version>2.18.6</jackson.version>
         <elemental2.version>1.3.2</elemental2.version>
-        <gwt.i18n.version>1.0.2</gwt.i18n.version>
+        <slf4j-api.version>2.0.18</slf4j-api.version>
 
+
+        <domino.aggregator.version>1.0.3</domino.aggregator.version>
+        <domino.slf4j.version>2.0.0</domino.slf4j.version>
         <domino.history.version>1.0.6</domino.history.version>
         <domino.ui.version>2.1.1</domino.ui.version>
         <domino.auto.version>1.0.3</domino.auto.version>
@@ -222,6 +223,8 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven.javadoc.plugin}</version>
                 <configuration>
+                    <sourcepath>${project.basedir}/src/main/java</sourcepath>
+                    <detectJavaApiLink>false</detectJavaApiLink>
                     <failOnError>false</failOnError>
                 </configuration>
                 <executions>

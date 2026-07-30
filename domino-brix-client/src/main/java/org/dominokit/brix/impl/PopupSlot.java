@@ -25,6 +25,11 @@ import org.dominokit.brix.api.ViewablePopup;
 /** Slot that opens and closes {@link ViewablePopup} implementations. */
 public class PopupSlot implements Slot {
 
+  /**
+   * Creates the shared popup slot instance.
+   *
+   * @return shared popup slot instance
+   */
   public static PopupSlot create() {
     return new PopupSlot();
   }

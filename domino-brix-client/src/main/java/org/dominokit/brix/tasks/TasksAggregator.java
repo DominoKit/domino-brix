@@ -51,7 +51,12 @@ public class TasksAggregator extends ContextAggregator.ContextWait<Void>
                 });
   }
 
-  /** Links the next aggregator to trigger once this one completes. */
+  /**
+   * Links the next aggregator to trigger once this one completes.
+   *
+   * @param nextAggregator next aggregator in the chain
+   * @return this aggregator for chaining
+   */
   public TasksAggregator setNextAggregator(TasksAggregator nextAggregator) {
     this.nextAggregator = nextAggregator;
     return this;
@@ -62,8 +67,8 @@ public class TasksAggregator extends ContextAggregator.ContextWait<Void>
     tasks.forEach(BrixStartupTask::run);
   }
 
-  @Override
   /** Sorts aggregators by their order value. */
+  @Override
   public int compareTo(TasksAggregator o) {
     return this.order.compareTo(o.order);
   }

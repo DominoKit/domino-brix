@@ -27,26 +27,65 @@ import org.dominokit.domino.ui.utils.DominoElement;
 /** Slot that appends view elements to a host element without clearing previous children. */
 public class AppendElementSlot implements Slot {
 
+  /** Slot type attribute for append-only slots. */
   public static final String APPEND_ELEMENT_SLOT = "brix-append-element-slot";
+
   private final String key;
   private final DominoElement<Element> element;
 
+  /** Creates a slot wrapper for the given DOM element. */
+  /**
+   * Creates a slot wrapper for the given DOM element.
+   *
+   * @param key slot key
+   * @param element DOM element
+   * @return slot wrapper
+   */
   public static AppendElementSlot of(String key, Element element) {
     return new AppendElementSlot(key, element);
   }
 
+  /** Creates a slot wrapper for the given DOM element abstraction. */
+  /**
+   * Creates a slot wrapper for the given DOM element abstraction.
+   *
+   * @param key slot key
+   * @param element DOM element abstraction
+   * @return slot wrapper
+   */
   public static AppendElementSlot of(String key, IsElement<? extends Element> element) {
     return new AppendElementSlot(key, element.element());
   }
 
+  /** Creates a slot that targets the supplied DOM element. */
+  /**
+   * Creates a slot that targets the supplied DOM element.
+   *
+   * @param key slot key
+   * @param element DOM element
+   */
   public AppendElementSlot(String key, Element element) {
     this(key, elementOf(element));
   }
 
+  /** Creates a slot that targets the supplied DOM element abstraction. */
+  /**
+   * Creates a slot that targets the supplied DOM element abstraction.
+   *
+   * @param key slot key
+   * @param element DOM element abstraction
+   */
   public AppendElementSlot(String key, IsElement<Element> element) {
     this(key, elementOf(element));
   }
 
+  /** Creates a slot that targets the supplied wrapped DOM element. */
+  /**
+   * Creates a slot that targets the supplied wrapped DOM element.
+   *
+   * @param key slot key
+   * @param element wrapped DOM element
+   */
   public AppendElementSlot(String key, DominoElement<Element> element) {
     this.key = key;
     this.element = element;

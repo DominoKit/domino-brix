@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 public class ConfigImpl implements Config {
   private final Map<String, String> configs = new HashMap<>();
 
+  /** Creates an empty in-memory configuration map. */
   @Inject
   public ConfigImpl() {}
 
@@ -33,11 +34,11 @@ public class ConfigImpl implements Config {
    * Initializes the configuration map. This method may only be called once.
    *
    * @param configs map of configuration entries
-   * @throws IllegalOperationException if called after initialization
+   * @throws IllegalStateException if called after initialization
    */
   public void init(Map<String, String> configs) {
     if (!this.configs.isEmpty()) {
-      throw new IllegalOperationException("Config have already been initialized.");
+      throw new ConfigAlreadyInitializedException("Config have already been initialized.");
     }
     this.configs.putAll(configs);
   }
@@ -49,8 +50,13 @@ public class ConfigImpl implements Config {
   }
 
   /** Thrown when attempting to mutate a sealed configuration. */
-  public static final class IllegalOperationException extends RuntimeException {
-    public IllegalOperationException(String message) {
+  public static final class ConfigAlreadyInitializedException extends RuntimeException {
+    /**
+     * Creates the exception with a human-readable message.
+     *
+     * @param message exception message
+     */
+    public ConfigAlreadyInitializedException(String message) {
       super(message);
     }
   }

@@ -52,7 +52,11 @@ public abstract class LazyInitializer {
         };
   }
 
-  /** Applies the lazy initialization logic. */
+  /**
+   * Applies the lazy initialization logic.
+   *
+   * @return this initializer
+   */
   public LazyInitializer apply() {
     if (!initialized) {
       function.run();
@@ -66,7 +70,12 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /** Executes the given function if already initialized. */
+  /**
+   * Executes the given function if already initialized.
+   *
+   * @param lambdaFunction action to run after initialization
+   * @return this initializer
+   */
   public LazyInitializer ifInitialized(Runnable lambdaFunction) {
     if (isInitialized()) {
       lambdaFunction.run();
@@ -74,7 +83,12 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /** Executes or defers functions to run once initialization completes. */
+  /**
+   * Executes or defers functions to run once initialization completes.
+   *
+   * @param functions actions to run when initialization completes
+   * @return this initializer
+   */
   public LazyInitializer whenInitialized(Runnable... functions) {
     if (isInitialized()) {
       for (Runnable func : functions) {
@@ -86,7 +100,12 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /** Executes the given function once on initialization, or immediately if already initialized. */
+  /**
+   * Executes the given function once on initialization, or immediately if already initialized.
+   *
+   * @param function action to run once
+   * @return this initializer
+   */
   public LazyInitializer doOnce(Runnable function) {
     if (isInitialized()) {
       function.run();
@@ -96,7 +115,12 @@ public abstract class LazyInitializer {
     return this;
   }
 
-  /** Adds a function to run when the initializer is reset. */
+  /**
+   * Adds a function to run when the initializer is reset.
+   *
+   * @param function action to run on reset
+   * @return this initializer
+   */
   public LazyInitializer onReset(Runnable function) {
     doOnReset.add(function);
     return this;

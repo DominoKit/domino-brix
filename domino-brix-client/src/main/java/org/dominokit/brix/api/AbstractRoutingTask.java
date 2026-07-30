@@ -26,9 +26,18 @@ import org.dominokit.domino.history.DominoHistory;
  */
 public abstract class AbstractRoutingTask<P extends Presenter<?>> implements RoutingTask {
 
+  /** Shared router used to subscribe to route changes. */
   protected final AppHistory history;
+
+  /** Listener that forwards routing state into the presenter. */
   protected final DominoHistory.StateListener listener;
 
+  /**
+   * Creates a routing task bound to the supplied router and presenter.
+   *
+   * @param history router to observe
+   * @param presenter presenter to activate when the route matches
+   */
   public AbstractRoutingTask(AppHistory history, P presenter) {
     this.history = history;
     this.listener =

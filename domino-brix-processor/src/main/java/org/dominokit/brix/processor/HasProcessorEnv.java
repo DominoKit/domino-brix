@@ -19,10 +19,20 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+/** Exposes annotation-processing utilities to helper classes. */
 public interface HasProcessorEnv {
+  /**
+   * @return type utilities
+   */
   Types types();
 
+  /**
+   * @return element utilities
+   */
   Elements elements();
 
+  /**
+   * @return messager for diagnostics
+   */
   Messager messager();
 }

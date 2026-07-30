@@ -38,6 +38,11 @@ public class Brix {
 
   private final CoreComponent coreComponent;
 
+  /**
+   * Creates the facade around the application core component.
+   *
+   * @param coreComponent core component backing this facade
+   */
   @Inject
   public Brix(CoreComponent coreComponent) {
     this.coreComponent = coreComponent;

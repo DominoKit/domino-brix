@@ -25,6 +25,7 @@ public abstract class BrixStartupTask {
 
   private final ContextAggregator.ContextWait<BrixStartupTask> contextWait;
 
+  /** Creates a startup task with a fresh completion tracker. */
   protected BrixStartupTask() {
     this.contextWait = new ContextAggregator.ContextWait<>();
   }

@@ -25,6 +25,7 @@ import java.util.Collections;
 import javax.annotation.processing.Processor;
 import javax.lang.model.SourceVersion;
 
+/** Annotation processor entry point for Domino Brix source generation. */
 @AutoService(Processor.class)
 public class DominoBrixProcessor extends BasicAnnotationProcessor {
   @Override

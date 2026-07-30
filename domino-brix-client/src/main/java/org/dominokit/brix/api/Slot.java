@@ -17,7 +17,10 @@ package org.dominokit.brix.api;
 
 /** A target location where presenters can reveal or remove {@link Viewable} instances. */
 public interface Slot {
+  /** Attribute key used to store the slot identifier on DOM elements. */
   String BRIX_SLOT_KEY = "brix-slot-key";
+
+  /** Attribute key used to store the slot implementation type on DOM elements. */
   String BRIX_SLOT_TYPE = "brix-slot-type";
 
   /**

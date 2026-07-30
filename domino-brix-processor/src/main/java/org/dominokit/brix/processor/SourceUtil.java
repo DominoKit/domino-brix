@@ -39,10 +39,16 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import org.dominokit.domino.apt.commons.ProcessorUtil;
 
+/** Shared utilities for inspecting annotation-processing model elements. */
 public class SourceUtil {
 
   private final HasProcessorEnv env;
 
+  /**
+   * Creates a utility helper backed by the supplied processing environment.
+   *
+   * @param env processing environment access
+   */
   public SourceUtil(HasProcessorEnv env) {
     this.env = env;
   }
@@ -177,6 +183,13 @@ public class SourceUtil {
     }
   }
 
+  /**
+   * Checks whether the supplied type mirrors or inherits the given interface.
+   *
+   * @param typeMirror type to inspect
+   * @param target interface type to match
+   * @return {@code true} when the type implements the target interface
+   */
   public boolean extendsInterface(TypeMirror typeMirror, Class<?> target) {
     if (isAssignableFrom(target, typeMirror)) {
       return true;
@@ -342,6 +355,7 @@ public class SourceUtil {
    *
    * @param beanType the type to search in
    * @param annotation the target annotation
+   * @param filter additional element filter
    * @return list of the elements that are annotated with the annotation
    */
   public List<Element> getAnnotatedElements(
@@ -359,6 +373,7 @@ public class SourceUtil {
    *
    * @param beanType the type to search in
    * @param annotation the target annotation
+   * @param filter additional element filter
    * @return list of the elements that are annotated with the annotation
    */
   public Optional<? extends Element> findFirstAnnotatedElement(
@@ -375,6 +390,7 @@ public class SourceUtil {
    *
    * @param typeElement the element to search in
    * @param annotation the target annotation
+   * @param filter additional element filter
    * @return list of the elements that are annotated with the annotation
    */
   public List<Element> getAnnotatedElements(
@@ -402,6 +418,7 @@ public class SourceUtil {
    *
    * @param typeElement the element to search in
    * @param annotation the target annotation
+   * @param filter additional element filter
    * @return list of the elements that are annotated with the annotation
    */
   public Optional<? extends Element> findFirstAnnotatedElement(
@@ -427,6 +444,12 @@ public class SourceUtil {
         (TypeElement) env.types().asElement(superclass), annotation, filter);
   }
 
+  /**
+   * Reports an exception through the compiler messager with its stack trace.
+   *
+   * @param messager compiler messager
+   * @param e exception to report
+   */
   public static void errorStackTrace(Messager messager, Exception e) {
     StringWriter out = new StringWriter();
     e.printStackTrace(new PrintWriter(out));

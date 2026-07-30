@@ -27,6 +27,11 @@ public class ChildPresenterRouting implements RoutingProvider {
 
   private RoutingProvider parent;
 
+  /**
+   * Creates a child routing provider chained to the given parent provider.
+   *
+   * @param parent parent routing provider
+   */
   public ChildPresenterRouting(RoutingProvider parent) {
     this.parent = parent;
   }

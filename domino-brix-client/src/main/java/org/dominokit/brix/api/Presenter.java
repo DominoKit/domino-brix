@@ -51,15 +51,21 @@ public abstract class Presenter<V extends Viewable>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Presenter.class);
 
-  private final String ID = UUID.randomUUID().toString();
+  private final String id = UUID.randomUUID().toString();
 
+  /** Shared application router injected from the core component. */
   @Inject @Global protected AppHistory globalRouter;
 
+  /** Shared event bus injected from the core component. */
   @Inject @Global protected BrixEvents events;
 
+  /** Shared slot registry injected from the core component. */
   @Inject @Global protected BrixSlots slots;
 
+  /** Security context used for authorization checks. */
   @Inject protected IsSecurityContext securityContext;
+
+  /** Shared configuration injected from the core component. */
   @Inject @Global protected Config config;
 
   private RegistrationRecord eventsListenerRecord;
@@ -67,13 +73,20 @@ public abstract class Presenter<V extends Viewable>
   private boolean active = false;
   private HistoryInterceptor navigationInterceptor;
   private RegistrationRecord slotListenerRecord;
+
+  /** Latest routing state observed for this presenter. */
   protected DominoHistory.State state;
+
   private final Set<RegistrationRecord> registeredSlots = new HashSet<>();
+
+  /** Lazily created view instance. */
   protected V view;
+
   private Set<ChildListener> childListeners = new HashSet<>();
-  private boolean reveled;
+  private boolean revealed;
   private ComponentProvider<?> componentProvider;
 
+  /** Creates the presenter base and assigns a stable identifier. */
   public Presenter() {
     LOGGER.debug("Presenter [" + this + "] have been created.");
   }
@@ -94,6 +107,8 @@ public abstract class Presenter<V extends Viewable>
   /**
    * Lazily provides the view instance. Subclasses override to supply the concrete view, optionally
    * delaying creation until first access.
+   *
+   * @return the presenter view or {@code null} when subclasses defer creation
    */
   protected V view() {
     return null;
@@ -106,7 +121,7 @@ public abstract class Presenter<V extends Viewable>
 
   private void onAttached() {
     LOGGER.debug("Presenter [" + this + "] : Attached.");
-    this.reveled = true;
+    this.revealed = true;
     registerSlots();
     onRevealed();
     onReady();
@@ -117,8 +132,8 @@ public abstract class Presenter<V extends Viewable>
 
   private void onReady() {
     LOGGER.debug("Presenter [" + this + "] : Ready.");
-    Set<ChildListener> temp = new HashSet<>(childListeners);
-    temp.forEach(
+    Set<ChildListener> copy = new HashSet<>(childListeners);
+    copy.forEach(
         listener -> {
           listener.invoke();
           childListeners.remove(listener);
@@ -138,10 +153,14 @@ public abstract class Presenter<V extends Viewable>
       deactivate();
     }
 
-    this.reveled = false;
+    this.revealed = false;
   }
 
-  /** Determines whether the presenter should auto-reveal when its slot becomes available. */
+  /**
+   * Determines whether the presenter should auto-reveal when its slot becomes available.
+   *
+   * @return {@code true} when auto-reveal is enabled
+   */
   protected boolean isAutoReveal() {
     return true;
   }
@@ -150,7 +169,11 @@ public abstract class Presenter<V extends Viewable>
   /** Receives events fired on the {@link BrixEvents} bus. Override to handle custom events. */
   public void onEventReceived(BrixEvent event) {}
 
-  /** Controls whether the presenter can become active. */
+  /**
+   * Controls whether the presenter can become active.
+   *
+   * @return {@code true} when the presenter is enabled
+   */
   protected boolean isEnabled() {
     return true;
   }
@@ -250,6 +273,11 @@ public abstract class Presenter<V extends Viewable>
     }
   }
 
+  /**
+   * Registers a slot with the shared registry and tracks its registration record.
+   *
+   * @param slot slot to register
+   */
   protected final void registerSlot(Slot slot) {
     registeredSlots.add(slots.register(slot));
   }
@@ -372,8 +400,8 @@ public abstract class Presenter<V extends Viewable>
   /**
    * @return {@code true} when the presenter has been revealed at least once
    */
-  public boolean isReveled() {
-    return reveled;
+  public boolean isRevealed() {
+    return revealed;
   }
 
   /** Override to map routing state into presenter fields. */
@@ -393,6 +421,6 @@ public abstract class Presenter<V extends Viewable>
 
   @Override
   public String toString() {
-    return this.getClass().getCanonicalName() + "[" + ID + "]";
+    return this.getClass().getCanonicalName() + "[" + id + "]";
   }
 }

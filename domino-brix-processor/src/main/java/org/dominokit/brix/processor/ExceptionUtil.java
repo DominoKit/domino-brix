@@ -22,6 +22,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 
+/** Utilities for reporting processor exceptions as compiler diagnostics. */
 public class ExceptionUtil {
 
   /**
@@ -31,8 +32,7 @@ public class ExceptionUtil {
   public static void messageStackTrace(Messager messager, Exception e) {
     StringWriter out = new StringWriter();
     e.printStackTrace(new PrintWriter(out));
-    messager.printMessage(
-        Diagnostic.Kind.ERROR, "error while creating source file " + out.getBuffer().toString());
+    messager.printMessage(Diagnostic.Kind.ERROR, getMsg(out));
   }
 
   /**
@@ -43,10 +43,7 @@ public class ExceptionUtil {
   public static void messageStackTrace(Messager messager, Exception e, Element element) {
     StringWriter out = new StringWriter();
     e.printStackTrace(new PrintWriter(out));
-    messager.printMessage(
-        Diagnostic.Kind.ERROR,
-        "error while creating source file " + out.getBuffer().toString(),
-        element);
+    messager.printMessage(Diagnostic.Kind.ERROR, getMsg(out), element);
   }
 
   /**
@@ -59,10 +56,10 @@ public class ExceptionUtil {
       Messager messager, Exception e, Element element, AnnotationMirror annotationMirror) {
     StringWriter out = new StringWriter();
     e.printStackTrace(new PrintWriter(out));
-    messager.printMessage(
-        Diagnostic.Kind.ERROR,
-        "error while creating source file " + out.getBuffer().toString(),
-        element,
-        annotationMirror);
+    messager.printMessage(Diagnostic.Kind.ERROR, getMsg(out), element, annotationMirror);
+  }
+
+  private static String getMsg(StringWriter out) {
+    return "error while creating source file " + out.getBuffer();
   }
 }

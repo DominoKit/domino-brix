@@ -20,6 +20,7 @@ import org.dominokit.brix.events.HasRoles;
 /** Authorizer that always permits access. Used as the framework default. */
 public class DefaultAuthorizer implements Authorizer {
 
+  /** Shared singleton instance. */
   public static final Authorizer INSTANCE = new DefaultAuthorizer();
 
   @Override

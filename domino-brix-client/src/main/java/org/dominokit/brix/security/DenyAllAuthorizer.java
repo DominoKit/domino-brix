@@ -19,6 +19,7 @@ import org.dominokit.brix.events.HasRoles;
 
 /** Authorizer that always denies access regardless of user roles. */
 public class DenyAllAuthorizer implements Authorizer {
+  /** Shared singleton instance. */
   public static final Authorizer INSTANCE = new DenyAllAuthorizer();
 
   @Override

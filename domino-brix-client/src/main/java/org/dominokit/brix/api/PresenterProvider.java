@@ -22,6 +22,11 @@ public abstract class PresenterProvider<P extends Presenter<?>> {
 
   private Lazy<P> presenter;
 
+  /**
+   * Creates a provider around the lazily injected presenter.
+   *
+   * @param presenter lazy presenter instance
+   */
   public PresenterProvider(Lazy<P> presenter) {
     this.presenter = presenter;
   }

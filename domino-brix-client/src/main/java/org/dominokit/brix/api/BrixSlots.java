@@ -37,13 +37,20 @@ import org.slf4j.LoggerFactory;
  */
 public class BrixSlots {
   private static final Logger LOGGER = LoggerFactory.getLogger(BrixSlots.class);
+
+  /** Default slot key for the body element. */
   public static final String BRIX_BODY_SLOT = "brix-body-slot";
+
+  /** Default slot key for the no-content placeholder. */
   public static final String BRIX_NO_CONTENT_SLOT = "brix-no-content-slot";
+
+  /** Default slot key for popup views. */
   public static final String BRIX_POPUP_SLOT = "brix-popup-slot";
 
   private final Map<String, Deque<Slot>> slots = new HashMap<>();
   private final Set<SlotListener> listeners = new HashSet<>();
 
+  /** Creates a registry with the framework's default slots already registered. */
   public BrixSlots() {
     register(BodyElementSlot.create());
     register(PopupSlot.create());
@@ -108,6 +115,11 @@ public class BrixSlots {
 
   /** Thrown when a presenter attempts to reveal without a registered slot. */
   public static class SlotNotDefinedException extends RuntimeException {
+    /**
+     * Creates the exception with a human-readable message.
+     *
+     * @param message exception message
+     */
     public SlotNotDefinedException(String message) {
       super(message);
     }
@@ -115,10 +127,18 @@ public class BrixSlots {
 
   /** Listener for slot registration/removal events. */
   public interface SlotListener {
-    /** Called when a slot becomes available. */
+    /**
+     * Called when a slot becomes available.
+     *
+     * @param key slot identifier
+     */
     void onSlotRegistered(String key);
 
-    /** Called when a slot is removed. */
+    /**
+     * Called when a slot is removed.
+     *
+     * @param key slot identifier
+     */
     void onSlotRemoved(String key);
   }
 }

@@ -46,6 +46,16 @@ public class BrixCore {
   private final Config config;
   private final SecurityContext securityContext;
 
+  /**
+   * Creates the shared runtime service container.
+   *
+   * @param router shared application router
+   * @param tasksRunner startup task runner
+   * @param events shared event bus
+   * @param slots shared slots registry
+   * @param config shared configuration holder
+   * @param securityContext shared security context
+   */
   @Inject
   public BrixCore(
       @Global AppHistory router,

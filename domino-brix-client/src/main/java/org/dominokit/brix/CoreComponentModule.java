@@ -18,24 +18,28 @@ package org.dominokit.brix;
 import dagger.Module;
 import javax.inject.Inject;
 
-@Module
 /**
  * Dagger module that bridges a pre-built {@link CoreComponent} into generated presentation modules,
  * allowing feature components to reuse the application's shared graph.
  */
+@Module
 public class CoreComponentModule implements PresentationModule {
   private CoreComponent coreComponent;
 
-  /** Wraps an existing {@link CoreComponent} to expose shared bindings to feature modules. */
+  /**
+   * Wraps an existing {@link CoreComponent} to expose shared bindings to feature modules.
+   *
+   * @param coreComponent shared core component
+   */
   @Inject
   public CoreComponentModule(CoreComponent coreComponent) {
     this.coreComponent = coreComponent;
   }
 
-  @Override
   /**
    * @return the backing core component
    */
+  @Override
   public CoreComponent coreComponent() {
     return this.coreComponent;
   }

@@ -62,26 +62,56 @@ public interface UserAttribute<T> {
   T getValue();
 
   /** Convenience factory for string attributes. */
+  /**
+   * Creates a string attribute.
+   *
+   * @param value attribute value
+   * @return attribute wrapper
+   */
   static UserAttribute<String> of(String value) {
     return () -> value;
   }
 
   /** Convenience factory for integer attributes. */
+  /**
+   * Creates an integer attribute.
+   *
+   * @param value attribute value
+   * @return attribute wrapper
+   */
   static UserAttribute<Integer> of(Integer value) {
     return () -> value;
   }
 
   /** Convenience factory for double attributes. */
+  /**
+   * Creates a double attribute.
+   *
+   * @param value attribute value
+   * @return attribute wrapper
+   */
   static UserAttribute<Double> of(Double value) {
     return () -> value;
   }
 
   /** Convenience factory for long attributes. */
+  /**
+   * Creates a long attribute.
+   *
+   * @param value attribute value
+   * @return attribute wrapper
+   */
   static UserAttribute<Long> of(Long value) {
     return () -> value;
   }
 
   /** Convenience factory for boolean attributes. */
+  /**
+   * Creates a boolean attribute.
+   *
+   * @param value attribute value
+   * @return attribute wrapper
+   */
   static UserAttribute<Boolean> of(Boolean value) {
     return () -> value;
   }

@@ -25,6 +25,11 @@ import org.dominokit.brix.api.Viewable;
 /** Slot dedicated to rendering fallback no-content views. */
 public class NoContentSlot implements Slot {
 
+  /**
+   * Creates the shared no-content slot instance.
+   *
+   * @return shared no-content slot instance
+   */
   public static NoContentSlot create() {
     return new NoContentSlot();
   }

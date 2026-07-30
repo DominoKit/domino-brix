@@ -41,7 +41,11 @@ public interface HasContext<T> {
             });
   }
 
-  /** Sets the current context. */
+  /**
+   * Sets the current context.
+   *
+   * @param context context value
+   */
   void setContext(IsContext<T> context);
 
   /**
@@ -81,21 +85,49 @@ public interface HasContext<T> {
 
   /** Listener notified when the context changes. */
   interface ContextListener<T> {
+    /**
+     * Called whenever the context changes.
+     *
+     * @param context context value
+     */
     void onContextChange(IsContext<T> context);
   }
 
   /** Describes an operation performed on the context payload. */
   interface Operation {
+    /** Marks newly created context data. */
     Operation CREATED = () -> "CREATED";
+
+    /** Marks updated context data. */
     Operation UPDATED = () -> "UPDATED";
+
+    /** Marks deleted context data. */
     Operation DELETED = () -> "DELETED";
 
+    /**
+     * Returns the operation key.
+     *
+     * @return operation key
+     */
     String getKey();
 
+    /**
+     * Returns {@code true} when the other operation shares the same key.
+     *
+     * @param other other operation
+     * @return {@code true} when the keys match
+     */
     default boolean isEqualTo(Operation other) {
       return getKey().equals(other.getKey());
     }
 
+    /**
+     * Runs the callback when the operations match.
+     *
+     * @param other other operation
+     * @param runnable callback to run
+     * @return this operation
+     */
     default Operation when(Operation other, Runnable runnable) {
       if (isEqualTo(other)) {
         runnable.run();
@@ -107,23 +139,14 @@ public interface HasContext<T> {
   /** Wrapper for context data, operation type, and source. */
   interface IsContext<T> {
     /**
-     * @return context data
+     * Creates a context wrapper with an explicit operation.
+     *
+     * @param <T> context value type
+     * @param source context source
+     * @param data context payload
+     * @param operation explicit operation
+     * @return new context wrapper
      */
-    T getData();
-
-    /**
-     * @return operation performed on the data
-     */
-    default Operation getOperation() {
-      return Operation.UPDATED;
-    }
-
-    /**
-     * @return source object that produced the context
-     */
-    Object getSource();
-
-    /** Factory to create a context with explicit operation. */
     static <T> IsContext<T> of(Object source, T data, Operation operation) {
       return new IsContext<T>() {
         @Override
@@ -146,17 +169,61 @@ public interface HasContext<T> {
       };
     }
 
-    /** Creates an UPDATED context wrapper. */
+    /**
+     * Returns the context data.
+     *
+     * @return context data
+     */
+    T getData();
+
+    /**
+     * Returns the operation performed on the data.
+     *
+     * @return operation performed on the data
+     */
+    default Operation getOperation() {
+      return Operation.UPDATED;
+    }
+
+    /**
+     * Returns the source object that produced the context.
+     *
+     * @return source object that produced the context
+     */
+    Object getSource();
+
+    /**
+     * Creates an UPDATED context wrapper.
+     *
+     * @param <T> context value type
+     * @param source context source
+     * @param data context payload
+     * @return new context wrapper
+     */
     static <T> IsContext<T> updated(Object source, T data) {
       return of(source, data, Operation.UPDATED);
     }
 
-    /** Creates a DELETED context wrapper. */
+    /**
+     * Creates a DELETED context wrapper.
+     *
+     * @param <T> context value type
+     * @param source context source
+     * @param data context payload
+     * @return new context wrapper
+     */
     static <T> IsContext<T> deleted(Object source, T data) {
       return of(source, data, Operation.DELETED);
     }
 
-    /** Creates a CREATED context wrapper. */
+    /**
+     * Creates a CREATED context wrapper.
+     *
+     * @param <T> context value type
+     * @param source context source
+     * @param data context payload
+     * @return new context wrapper
+     */
     static <T> IsContext<T> created(Object source, T data) {
       return of(source, data, Operation.CREATED);
     }

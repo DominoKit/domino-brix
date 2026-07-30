@@ -37,22 +37,59 @@ public class AcceptOneElementSlot implements Slot {
 
   private final DominoElement<Element> element;
 
+  /** Creates a slot wrapper for the given DOM element. */
+  /**
+   * Creates a slot wrapper for the given DOM element.
+   *
+   * @param key slot key
+   * @param element DOM element
+   * @return slot wrapper
+   */
   public static AcceptOneElementSlot of(String key, Element element) {
     return new AcceptOneElementSlot(key, element);
   }
 
+  /** Creates a slot wrapper for the given DOM element abstraction. */
+  /**
+   * Creates a slot wrapper for the given DOM element abstraction.
+   *
+   * @param key slot key
+   * @param element DOM element abstraction
+   * @return slot wrapper
+   */
   public static AcceptOneElementSlot of(String key, IsElement<? extends Element> element) {
     return new AcceptOneElementSlot(key, element.element());
   }
 
+  /** Creates a slot that targets the supplied DOM element. */
+  /**
+   * Creates a slot that targets the supplied DOM element.
+   *
+   * @param key slot key
+   * @param element DOM element
+   */
   public AcceptOneElementSlot(String key, Element element) {
     this(key, elementOf(element));
   }
 
+  /** Creates a slot that targets the supplied DOM element abstraction. */
+  /**
+   * Creates a slot that targets the supplied DOM element abstraction.
+   *
+   * @param key slot key
+   * @param element DOM element abstraction
+   */
   public AcceptOneElementSlot(String key, IsElement<Element> element) {
     this(key, elementOf(element));
   }
 
+  /** Creates a slot that targets the supplied wrapped DOM element. */
+  /**
+   * Creates a slot that targets the supplied wrapped DOM element.
+   *
+   * @param key slot key
+   * @param element wrapped DOM element
+   */
   public AcceptOneElementSlot(String key, DominoElement<Element> element) {
     this.key = key;
     this.element = element;
